@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:padding="24dp"
+    android:background="#F5F5F5">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Speech Model App"
+        android:textSize="28sp"
+        android:textStyle="bold"
+        android:textColor="#2C3E50"
+        android:layout_marginBottom="48dp"
+        android:gravity="center" />
+
+    <Button
+        android:id="@+id/btnTextToSpeech"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:text="Text to Speech"
+        android:textSize="18sp"
+        android:textColor="#FFFFFF"
+        android:background="@drawable/rounded_button"
+        android:backgroundTint="#3498DB"
+        android:layout_marginBottom="24dp"
+        android:elevation="4dp" />
+
+    <Button
+        android:id="@+id/btnSpeechToText"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:text="Speech to Text"
+        android:textSize="18sp"
+        android:textColor="#FFFFFF"
+        android:background="@drawable/rounded_button"
+        android:backgroundTint="#E74C3C"
+        android:elevation="4dp" />
+
+</LinearLayout>

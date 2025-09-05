@@ -1,0 +1,25 @@
+<resources>
+    <string name="app_name">Speech Model</string>
+    <string name="speech_to_text">Speech to Text</string>
+    <string name="tap_microphone_to_start">Tap microphone to start</string>
+    <string name="min_symbol">🎤</string>
+    <string name="recognized_text">Recognized Text:</string>
+    <string name="your_speech_will_appear_here">Your speech will appear here...</string>
+    <string name="enter_text_to_speak">Enter text to speak...</string>
+    <string name="speak_text">🔊 Speak Text</string>
+    <string name="text_to_speech">Text to Speech</string>
+    <string name="enter_text_hint">Enter text to speak...</string>
+    <string name="start_listening">🎤 Start Listening</string>
+    <string name="stop_listening">🔴 Stop Listening</string>
+    <string name="listening_status">Listening... Speak now</string>
+    <string name="tap_microphone">Tap microphone to start</string>
+    <string name="speech_result_placeholder">Your speech will appear here...</string>
+    <string name="speech_model_app">Speech Model App</string>
+    <string name="select_language">Select Language:</string>
+    <string name="select_voice_type">Select Voice Type:</string>
+    <string name="select_recognition_language">Select Recognition Language:</string>
+    <string name="speech_speed">Speech Speed:</string>
+    <string name="speed_min">0.5x</string>
+    <string name="speed_max">2.5x</string>
+    <string name="default_speed">1.0x</string>
+</resources>
