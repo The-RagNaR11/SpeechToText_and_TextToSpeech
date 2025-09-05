@@ -32,12 +32,14 @@ jobs:
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
           restore-keys: |
             ${{ runner.os }}-gradle-
-
-      # 4. Build Debug APK
+      # 4. grant permission
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+      # 5. Build Debug APK
       - name: Build with Gradle
         run: ./gradlew assembleDebug
 
-      # 5. Upload APK as artifact
+      # 6. Upload APK as artifact
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
