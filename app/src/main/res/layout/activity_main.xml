@@ -4,7 +4,6 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:gravity="center"
-    android:padding="24dp"
     android:background="#F5F5F5">
 
     <TextView
@@ -13,31 +12,58 @@
         android:text="Speech Model App"
         android:textSize="28sp"
         android:textStyle="bold"
+        android:layout_marginTop="15dp"
         android:textColor="#2C3E50"
-        android:layout_marginBottom="48dp"
-        android:gravity="center" />
-
-    <Button
-        android:id="@+id/btnTextToSpeech"
+        android:layout_marginBottom="10dp"/>
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="60dp"
-        android:text="Text to Speech"
-        android:textSize="18sp"
-        android:textColor="#FFFFFF"
-        android:background="@drawable/rounded_button"
-        android:backgroundTint="#3498DB"
-        android:layout_marginBottom="24dp"
-        android:elevation="4dp" />
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingHorizontal="15dp">
+        <Button
+            android:id="@+id/btnTextToSpeech"
+            android:layout_width="0dp"
+            android:layout_weight="0.5"
+            android:layout_height="40dp"
+            android:text="TTS"
+            android:textSize="18sp"
+            android:textColor="#FFFFFF"
+            android:layout_marginHorizontal="5dp"
+            android:background="@drawable/rounded_button"
+            android:backgroundTint="#3498DB"
+            android:elevation="4dp" />
 
-    <Button
-        android:id="@+id/btnSpeechToText"
+        <Button
+            android:id="@+id/btnSpeechToText"
+            android:layout_width="0dp"
+            android:layout_weight="0.5"
+            android:layout_height="40dp"
+            android:text="STT"
+            android:textSize="18sp"
+            android:layout_marginHorizontal="5dp"
+            android:textColor="#FFFFFF"
+            android:background="@drawable/rounded_button"
+            android:backgroundTint="#E74C3C"
+            android:elevation="4dp" />
+        <Button
+            android:id="@+id/btnSimulation"
+            android:layout_width="0dp"
+            android:layout_weight="0.5"
+            android:layout_height="40dp"
+            android:text="Sim"
+            android:textSize="18sp"
+            android:layout_marginHorizontal="5dp"
+            android:textColor="#FFFFFF"
+            android:background="@drawable/rounded_button"
+            android:backgroundTint="#E74C3C"
+            android:elevation="4dp" />
+    </LinearLayout>
+
+    <FrameLayout
+        android:id="@+id/frameLayout"
         android:layout_width="match_parent"
-        android:layout_height="60dp"
-        android:text="Speech to Text"
-        android:textSize="18sp"
-        android:textColor="#FFFFFF"
-        android:background="@drawable/rounded_button"
-        android:backgroundTint="#E74C3C"
-        android:elevation="4dp" />
+        android:layout_height="match_parent"
+        android:layout_marginTop="10dp"/>
+
 
 </LinearLayout>

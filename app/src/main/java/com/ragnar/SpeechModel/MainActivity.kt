@@ -1,9 +1,11 @@
 package com.ragnar.SpeechModel
 
-import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
+import com.ragnar.SpeechModel.Simulations.RaceStorySimulationFragment
+import com.ragnar.SpeechModel.SpeechModels.SpeechToTextFragment
+import com.ragnar.SpeechModel.SpeechModels.TextToSpeechFragment
 
 class MainActivity : AppCompatActivity() {
 
@@ -13,15 +15,28 @@ class MainActivity : AppCompatActivity() {
 
         val btnTextToSpeech = findViewById<Button>(R.id.btnTextToSpeech)
         val btnSpeechToText = findViewById<Button>(R.id.btnSpeechToText)
+        val simulationButton = findViewById<Button>(R.id.btnSimulation)
+
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.frameLayout, SpeechToTextFragment())
+            .commit()
 
         btnTextToSpeech.setOnClickListener {
-            val intent = Intent(this, TextToSpeechActivity::class.java)
-            startActivity(intent)
+            supportFragmentManager.beginTransaction()
+                .replace(R.id.frameLayout, TextToSpeechFragment())
+                .commit()
         }
 
         btnSpeechToText.setOnClickListener {
-            val intent = Intent(this, SpeechToTextActivity::class.java)
-            startActivity(intent)
+            supportFragmentManager.beginTransaction()
+                .replace(R.id.frameLayout, SpeechToTextFragment())
+                .commit()
+        }
+
+        simulationButton.setOnClickListener {
+            supportFragmentManager.beginTransaction()
+                .replace(R.id.frameLayout, RaceStorySimulationFragment())
+                .commit()
         }
     }
 }

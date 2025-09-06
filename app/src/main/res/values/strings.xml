@@ -22,4 +22,6 @@
     <string name="speed_min">0.5x</string>
     <string name="speed_max">2.5x</string>
     <string name="default_speed">1.0x</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
