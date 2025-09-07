@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F5F5F5">
+    android:background="@color/background_secondary">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -18,8 +17,8 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="24dp"
             android:gravity="center"
-            android:text="Text to Speech"
-            android:textColor="#2C3E50"
+            android:text="@string/text_to_speech"
+            android:textColor="@color/color_accent"
             android:textSize="24sp"
             android:textStyle="bold" />
 
@@ -33,8 +32,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8dp"
-                android:text="Select Language:"
-                android:textColor="#34495E"
+                android:text="@string/select_language"
+                android:textColor="@color/text_primary"
                 android:textSize="16sp"
                 android:textStyle="bold" />
 
@@ -43,6 +42,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
                 android:background="@drawable/rounded_spinner"
+                android:foregroundTint="@color/text_primary"
                 android:padding="12dp" />
 
         </LinearLayout>
@@ -57,7 +57,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8dp"
-                android:text="Select Voice Type:"
+                android:text="@string/select_voice_type"
                 android:textColor="#34495E"
                 android:textSize="16sp"
                 android:textStyle="bold" />
@@ -66,6 +66,7 @@
                 android:id="@+id/spinnerVoice"
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
+                android:foregroundTint="@color/text_primary"
                 android:background="@drawable/rounded_spinner"
                 android:padding="12dp" />
 
@@ -87,7 +88,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="Speech Speed:"
+                    android:text="@string/speech_speed"
                     android:textColor="#34495E"
                     android:textSize="16sp"
                     android:textStyle="bold" />
@@ -158,7 +159,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="Speech Pitch:"
+                    android:text="@string/speech_pitch"
                     android:textSize="16sp"
                     android:textStyle="bold"
                     android:textColor="#34495E" />
@@ -223,15 +224,16 @@
                 android:layout_height="120dp"
                 android:background="@drawable/rounded_edittext"
                 android:gravity="top|start"
-                android:hint="Enter text to speak..."
+                android:textColorHint="@color/text_secondary"
+                android:hint="@string/enter_text_to_speak"
                 android:inputType="textMultiLine"
                 android:padding="16dp"
-                android:textColor="#2C3E50"
+                android:textColor="@color/text_primary"
                 android:textSize="16sp" />
 
         </com.google.android.material.textfield.TextInputLayout>
 
-        <Button
+        <TextView
             android:id="@+id/btnSpeak"
             android:layout_width="match_parent"
             android:layout_height="60dp"
@@ -239,9 +241,10 @@
             android:backgroundTint="#3498DB"
             android:elevation="4dp"
             android:enabled="false"
-            android:text="🔊 Speak Text"
-            android:textColor="#FFFFFF"
-            android:textSize="18sp" />
+            android:gravity="center"
+            android:text="@string/speech_to_text"
+            android:textColor="@color/white"
+            android:textSize="20sp" />
 
     </LinearLayout>
 

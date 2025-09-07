@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/speechToText"
+        android:icon="@drawable/ic_speech_to_text"
+        android:title="@string/speech_to_text"/>
+    <item
+        android:id="@+id/textToSpeech"
+        android:icon="@drawable/ic_text_to_speech"
+        android:title="@string/text_to_speech"/>
+    <item
+        android:id="@+id/simulations"
+        android:icon="@drawable/ic_simulation"
+        android:title="@string/simulations"/>
+</menu>

@@ -2,4 +2,23 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+    <color name="background_primary">#FEFEFE</color>
+    <color name="background_secondary">#F5F9FF</color>
+
+    <!-- Brand / Accent Colors -->
+    <color name="color_primary">#0267CC</color>
+    <color name="color_primary_dark">#000175</color>
+    <color name="color_secondary">#08B4FD</color>
+    <color name="color_accent">#0000E0</color>
+
+    <!-- Text Colors -->
+    <color name="text_primary">#000000</color>
+    <color name="text_secondary">#5B5B5B</color>
+
+    <!-- UI States -->
+    <color name="color_hint">#808080</color>
+    <color name="color_error">#FF3B30</color>
+    <color name="color_success">#34C759</color>
+    <color name="color_warning">#FF9500</color>
 </resources>

@@ -5,7 +5,7 @@
     android:orientation="vertical"
     android:padding="24dp"
     android:gravity="center"
-    android:background="#F5F5F5">
+    android:background="@color/background_secondary">
 
     <TextView
         android:layout_width="wrap_content"
@@ -23,7 +23,7 @@
         android:layout_height="wrap_content"
         android:text="@string/tap_microphone_to_start"
         android:textSize="16sp"
-        android:textColor="#7F8C8D"
+        android:textColor="@color/color_error"
         android:layout_marginBottom="24dp"
         android:gravity="center" />
 
@@ -45,7 +45,7 @@
         android:text="@string/recognized_text"
         android:textSize="18sp"
         android:textStyle="bold"
-        android:textColor="#2C3E50"
+        android:textColor="@color/text_primary"
         android:layout_marginBottom="16dp" />
 
     <ScrollView

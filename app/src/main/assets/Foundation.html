@@ -1,176 +1,1262 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Speed-Distance-Time Learning Tool</title>
-<style>
-  body { font-family: Arial, sans-serif; background: #f4f4f4; margin: 0; }
-  .container { display: flex; height: 100vh; }
-  .left-panel { flex: 3; display: flex; flex-direction: column; }
-  .tabs { display: flex; background: #222; color: white; }
-  .tabs button {
-      flex: 1; padding: 10px; background: #222; color: white;
-      border: none; cursor: pointer; font-size: 16px;
-  }
-  .tabs button.active { background: #444; }
-  .tab-content { flex: 1; padding: 20px; background: white; }
-  .track { width: 90%; height: 80px; background: #ddd; border-radius: 10px;
-           margin: 20px auto; position: relative; }
-  .object { width: 40px; height: 40px; background: red; border-radius: 50%;
-            position: absolute; top: 20px; left: 0; }
-  .controls { display: flex; flex-direction: column; gap: 10px; width: 80%; margin: auto; }
-  .sidebar { flex: 1; background: #fafafa; border-left: 1px solid #ccc;
-             display: flex; flex-direction: column; padding: 10px; }
-  .chatbot { flex: 1; border: 1px solid #ccc; border-radius: 5px;
-             padding: 8px; background: white; overflow-y: auto; }
-  .chat-input { display: flex; margin-top: 10px; }
-  .chat-input input { flex: 1; padding: 8px; }
-  .chat-input button { padding: 8px 12px; }
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Foundation - Speed Distance Time Learning Tool</title>
+
+  <style>
+    :root {
+      --primary: #6366f1;
+      --primary-dark: #4f46e5;
+      --primary-light: #a5b4fc;
+      --secondary: #f59e0b;
+      --success: #10b981;
+      --danger: #ef4444;
+      --warning: #f59e0b;
+      --surface: #ffffff;
+      --surface-alt: #f8fafc;
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --text-light: #94a3b8;
+      --border: #e2e8f0;
+      --shadow: 0 1px 3px 0 rgba(0,0,0,0.1);
+      --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1);
+      --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1);
+      --radius: 12px;
+      --radius-lg: 16px;
+      --spacing: 16px;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --surface: #1e293b;
+        --surface-alt: #334155;
+        --text: #f1f5f9;
+        --text-muted: #94a3b8;
+        --text-light: #64748b;
+        --border: #475569;
+      }
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+      -webkit-touch-callout: none;
+    }
+
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Inter, sans-serif;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+      color: var(--text);
+      font-size: 16px;
+      line-height: 1.6;
+      -webkit-text-size-adjust: 100%;
+      -webkit-font-smoothing: antialiased;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Modern glass header */
+    header {
+      background: rgba(255,255,255,0.1);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(255,255,255,0.2);
+      color: white;
+      padding: 20px 24px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 4px 32px rgba(0,0,0,0.1);
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 20px;
+      font-weight: 700;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      letter-spacing: -0.025em;
+    }
+
+    /* Main container */
+    .container {
+      display: flex;
+      flex-direction: column;
+      min-height: calc(100vh - 80px);
+    }
+
+    /* Enhanced tab system */
+    .tabs {
+      display: flex;
+      gap: 8px;
+      margin: 20px 24px 0 24px;
+      padding: 4px;
+      background: rgba(255,255,255,0.1);
+      border-radius: var(--radius);
+      overflow-x: auto;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+    }
+
+    .tabs::-webkit-scrollbar {
+      display: none;
+    }
+
+    .tab-btn {
+      padding: 12px 20px;
+      border-radius: 8px;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 600;
+      white-space: nowrap;
+      min-width: 120px;
+      text-align: center;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      color: rgba(255,255,255,0.7);
+      position: relative;
+    }
+
+    .tab-btn.active {
+      background: var(--surface);
+      color: var(--primary);
+      box-shadow: var(--shadow-md);
+      transform: translateY(-1px);
+    }
+
+    .tab-btn:not(.active):hover {
+      background: rgba(255,255,255,0.1);
+      color: white;
+    }
+
+    /* Main content area */
+    .main-content {
+      display: flex;
+      flex: 1;
+      gap: 20px;
+      padding: 24px;
+      max-width: 1200px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    /* Left panel - simulation area */
+    .left-panel {
+      flex: 3;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Card system */
+    .card {
+      background: var(--surface);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      box-shadow: var(--shadow-lg);
+      border: 1px solid var(--border);
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      flex: 1;
+    }
+
+    .card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--primary), var(--primary-light));
+    }
+
+    /* Enhanced track visualization */
+    .track {
+      height: 140px;
+      border-radius: var(--radius);
+      background: linear-gradient(180deg, #f1f5f9 0%, #e2e8f0 100%);
+      position: relative;
+      overflow: hidden;
+      border: 2px solid var(--border);
+      margin: 20px 0;
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .track::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 20px;
+      right: 20px;
+      height: 2px;
+      background: repeating-linear-gradient(
+        90deg,
+        var(--text-muted) 0px,
+        var(--text-muted) 10px,
+        transparent 10px,
+        transparent 20px
+      );
+      transform: translateY(-50%);
+      opacity: 0.3;
+    }
+
+    .object {
+      position: absolute;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      color: white;
+      box-shadow: var(--shadow-lg);
+      font-size: 18px;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      border: 3px solid rgba(255,255,255,0.3);
+      background: linear-gradient(135deg, #ef4444, #dc2626);
+      top: 45px;
+      left: 20px;
+    }
+
+    .object:hover {
+      transform: scale(1.1);
+    }
+
+    /* For comparative mode objects */
+    #obj3a {
+      background: linear-gradient(135deg, #3b82f6, #2563eb);
+      top: 25px;
+    }
+
+    #obj3b {
+      background: linear-gradient(135deg, #10b981, #059669);
+      top: 85px;
+    }
+
+    /* Enhanced controls */
+    .controls {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      margin: 24px 0;
+    }
+
+    .control-group {
+      background: var(--surface-alt);
+      padding: 20px;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      transition: all 0.2s ease;
+    }
+
+    .control-group:focus-within {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    }
+
+    label {
+      font-size: 14px;
+      color: var(--text-muted);
+      display: block;
+      margin-bottom: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.025em;
+    }
+
+    .label-value {
+      color: var(--primary);
+      font-weight: 700;
+      font-size: 18px;
+      text-transform: none;
+      letter-spacing: normal;
+    }
+
+    /* Modern slider design */
+    input[type=range] {
+      width: 100%;
+      height: 6px;
+      border-radius: 3px;
+      background: var(--border);
+      outline: none;
+      -webkit-appearance: none;
+      margin: 12px 0;
+      position: relative;
+    }
+
+    input[type=range]::-webkit-slider-track {
+      height: 6px;
+      border-radius: 3px;
+      background: var(--border);
+    }
+
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: var(--primary);
+      cursor: pointer;
+      box-shadow: var(--shadow-md);
+      transition: all 0.2s ease;
+      border: 2px solid var(--surface);
+    }
+
+    input[type=range]::-webkit-slider-thumb:hover {
+      transform: scale(1.2);
+      box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+    }
+
+    input[type=range]::-moz-range-thumb {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: var(--primary);
+      cursor: pointer;
+      border: 2px solid var(--surface);
+      box-shadow: var(--shadow-md);
+    }
+
+    /* Enhanced form inputs */
+    input[type=number], select {
+      width: 100%;
+      padding: 16px;
+      border-radius: var(--radius);
+      border: 2px solid var(--border);
+      font-size: 16px;
+      background: var(--surface);
+      color: var(--text);
+      transition: all 0.2s ease;
+      font-weight: 500;
+    }
+
+    input[type=number]:focus, select:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    }
+
+    /* Modern button system */
+    .btn {
+      padding: 16px 24px;
+      border-radius: var(--radius);
+      border: none;
+      background: var(--primary);
+      color: white;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: 600;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      min-height: 52px;
+      touch-action: manipulation;
+      position: relative;
+      overflow: hidden;
+      text-transform: uppercase;
+      letter-spacing: 0.025em;
+      margin: 8px 0;
+    }
+
+    .btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+      transition: left 0.5s;
+    }
+
+    .btn:hover::before {
+      left: 100%;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px rgba(99, 102, 241, 0.4);
+    }
+
+    .btn:active {
+      transform: translateY(0);
+    }
+
+    .btn.secondary {
+      background: var(--surface);
+      border: 2px solid var(--primary);
+      color: var(--primary);
+    }
+
+    .btn.success {
+      background: var(--success);
+    }
+
+    .btn.warning {
+      background: var(--warning);
+    }
+
+    .btn.danger {
+      background: var(--danger);
+    }
+
+    /* Button row layout */
+    .button-row {
+      display: flex;
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .button-row .btn {
+      flex: 1;
+      margin: 0;
+    }
+
+    /* Tab content */
+    .tab-content {
+      display: none;
+      animation: slideIn 0.3s ease;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Right sidebar - chatbot */
+    .sidebar {
+      flex: 1;
+      min-width: 300px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .chatbot-card {
+      background: var(--surface);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-lg);
+      border: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      min-height: 400px;
+    }
+
+    .chatbot-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--success), var(--primary-light));
+    }
+
+    .chatbot-header {
+      padding: 20px 24px 12px 24px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .chatbot-header h3 {
+      margin: 0;
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .chatbot {
+      flex: 1;
+      padding: 16px;
+      background: var(--surface-alt);
+      overflow-y: auto;
+      font-size: 14px;
+      line-height: 1.5;
+      scrollbar-width: thin;
+      scrollbar-color: var(--border) transparent;
+    }
+
+    .chatbot::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .chatbot::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    .chatbot::-webkit-scrollbar-thumb {
+      background: var(--border);
+      border-radius: 3px;
+    }
+
+    .chat-message {
+      margin-bottom: 12px;
+      padding: 12px 16px;
+      border-radius: var(--radius);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      animation: messageIn 0.3s ease;
+    }
+
+    @keyframes messageIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .chat-message b {
+      color: var(--primary);
+      font-weight: 700;
+    }
+
+    .chat-input-container {
+      padding: 16px;
+      border-top: 1px solid var(--border);
+      background: var(--surface);
+    }
+
+    .chat-input {
+      display: flex;
+      gap: 8px;
+    }
+
+    .chat-input input {
+      flex: 1;
+      padding: 12px 16px;
+      border-radius: var(--radius);
+      border: 2px solid var(--border);
+      font-size: 14px;
+      background: var(--surface-alt);
+      color: var(--text);
+      transition: all 0.2s ease;
+    }
+
+    .chat-input input:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    }
+
+    .chat-input button {
+      padding: 12px 20px;
+      border-radius: var(--radius);
+      border: none;
+      background: var(--primary);
+      color: white;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.2s ease;
+      text-transform: uppercase;
+      letter-spacing: 0.025em;
+      font-size: 12px;
+    }
+
+    .chat-input button:hover {
+      background: var(--primary-dark);
+      transform: translateY(-1px);
+    }
+
+    /* Enhanced result display */
+    .result-display {
+      background: rgba(99, 102, 241, 0.05);
+      border: 2px solid var(--primary-light);
+      border-radius: var(--radius);
+      padding: 20px;
+      margin: 16px 0;
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--primary);
+      text-align: center;
+      animation: resultIn 0.5s ease;
+    }
+
+    @keyframes resultIn {
+      from {
+        opacity: 0;
+        transform: scale(0.95);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    /* Typography */
+    h2 {
+      margin: 0 0 12px 0;
+      font-size: 24px;
+      font-weight: 800;
+      color: var(--text);
+      letter-spacing: -0.025em;
+    }
+
+    h3 {
+      margin: 0 0 16px 0;
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: -0.025em;
+    }
+
+    p {
+      margin: 0 0 16px 0;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    /* Mobile optimizations */
+    @media (max-width: 768px) {
+      .main-content {
+        flex-direction: column;
+        padding: 16px;
+        gap: 16px;
+      }
+
+      .sidebar {
+        min-width: unset;
+        order: -1;
+      }
+
+      .chatbot-card {
+        min-height: 200px;
+      }
+
+      .card {
+        padding: 20px;
+      }
+
+      header {
+        padding: 16px 20px;
+      }
+
+      header h1 {
+        font-size: 18px;
+      }
+
+      .track {
+        height: 120px;
+      }
+
+      .object {
+        width: 44px;
+        height: 44px;
+        font-size: 16px;
+      }
+
+      #obj3a {
+        top: 20px;
+      }
+
+      #obj3b {
+        top: 75px;
+      }
+
+      .btn {
+        padding: 14px 20px;
+        font-size: 15px;
+        min-height: 48px;
+      }
+
+      .tab-btn {
+        padding: 12px 16px;
+        min-width: 100px;
+        font-size: 13px;
+      }
+
+      .button-row {
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      h2 {
+        font-size: 22px;
+      }
+
+      h3 {
+        font-size: 18px;
+      }
+    }
+
+    /* Accessibility improvements */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+
+    /* Focus indicators */
+    button:focus-visible, input:focus-visible, select:focus-visible {
+      outline: 2px solid var(--primary);
+      outline-offset: 2px;
+    }
+
+    /* Loading states */
+    .loading {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .loading::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+      animation: shimmer 1.5s infinite;
+    }
+
+    @keyframes shimmer {
+      0% { left: -100%; }
+      100% { left: 100%; }
+    }
+  </style>
 </head>
 <body>
+<header>
+  <h1>Foundation - Speed, Distance & Time Learning</h1>
+</header>
 
 <div class="container">
-  <div class="left-panel">
-    <div class="tabs">
-      <button id="tab1" class="active" onclick="switchTab(1)">Foundation</button>
-      <button id="tab2" onclick="switchTab(2)">Formula Discovery</button>
-      <button id="tab3" onclick="switchTab(3)">Comparative</button>
-    </div>
-
-    <!-- Tab Contents -->
-    <div id="content1" class="tab-content">
-      <h2>Foundation Simulation</h2>
-      <div class="track"><div class="object" id="obj1"></div></div>
-      <div class="controls">
-        <label>Speed (m/s): <span id="speedVal1">5</span></label>
-        <input type="range" id="speed1" min="1" max="20" value="5">
-        <label>Distance (m): <span id="distVal1">100</span></label>
-        <input type="range" id="dist1" min="50" max="300" value="100">
-        <button onclick="startSim(1)">Start</button>
-        <button onclick="resetSim(1)">Reset</button>
-      </div>
-    </div>
-
-    <div id="content2" class="tab-content" style="display:none;">
-      <h2>Formula Discovery Simulation</h2>
-      <p>Adjust two values; system calculates the third.</p>
-      <div class="controls">
-        <label>Speed (m/s): <input type="number" id="speed2" value="10"></label>
-        <label>Time (s): <input type="number" id="time2" value="5"></label>
-        <button onclick="calcDistance()">Calculate Distance</button>
-        <p id="result2"></p>
-      </div>
-    </div>
-
-    <div id="content3" class="tab-content" style="display:none;">
-      <h2>Comparative Simulation</h2>
-      <div class="track"><div class="object" id="obj3a" style="background:blue;"></div>
-                         <div class="object" id="obj3b" style="background:green; top:40px;"></div></div>
-      <div class="controls">
-        <label>Speed A (m/s): <span id="speedA">6</span></label>
-        <input type="range" id="speed3a" min="1" max="15" value="6">
-        <label>Speed B (m/s): <span id="speedB">10</span></label>
-        <input type="range" id="speed3b" min="1" max="15" value="10">
-        <button onclick="startSim(3)">Start Race</button>
-        <button onclick="resetSim(3)">Reset</button>
-      </div>
-    </div>
+  <!-- Enhanced Tab Navigation -->
+  <div class="tabs">
+    <button class="tab-btn active" id="tab1" onclick="switchTab(1)">Foundation</button>
+    <button class="tab-btn" id="tab2" onclick="switchTab(2)">Formula Discovery</button>
+    <button class="tab-btn" id="tab3" onclick="switchTab(3)">Comparative</button>
   </div>
 
-  <!-- Chatbot -->
-  <div class="sidebar">
-    <h3>Chatbot</h3>
-    <div class="chatbot" id="chatbox">
-      <p><b>Bot:</b> Hi! Select a simulation to start learning.</p>
+  <div class="main-content">
+    <!-- Left Panel - Simulation Area -->
+    <div class="left-panel">
+      <!-- Foundation Simulation -->
+      <div id="content1" class="tab-content active">
+        <div class="card">
+          <h2>Foundation Simulation</h2>
+          <p>Explore the basic relationship between speed, distance, and time. Adjust the speed and distance, then watch the object move!</p>
+
+          <div class="track">
+            <div class="object" id="obj1">●</div>
+          </div>
+
+          <div class="controls">
+            <div class="control-group">
+              <label>Speed: <span class="label-value" id="speedVal1">5</span> m/s</label>
+              <input type="range" id="speed1" min="1" max="20" value="5">
+            </div>
+
+            <div class="control-group">
+              <label>Distance: <span class="label-value" id="distVal1">100</span> meters</label>
+              <input type="range" id="dist1" min="50" max="300" value="100">
+            </div>
+
+            <div class="button-row">
+              <button class="btn success" onclick="startSim(1)">Start Simulation</button>
+              <button class="btn secondary" onclick="resetSim(1)">Reset</button>
+            </div>
+          </div>
+
+          <div id="result1" class="result-display" style="display:none;"></div>
+        </div>
+      </div>
+
+      <!-- Formula Discovery Simulation -->
+      <div id="content2" class="tab-content">
+        <div class="card">
+          <h2>Formula Discovery</h2>
+          <p>Set two values and let the system calculate the third. Discover the mathematical relationship between speed, distance, and time!</p>
+
+          <div class="controls">
+            <div class="control-group">
+              <label>Speed (m/s)</label>
+              <input type="number" id="speed2" value="10" min="0.1" step="0.1">
+            </div>
+
+            <div class="control-group">
+              <label>Time (seconds)</label>
+              <input type="number" id="time2" value="5" min="0.1" step="0.1">
+            </div>
+
+            <div class="button-row">
+              <button class="btn" onclick="calcDistance()">Calculate Distance</button>
+              <button class="btn secondary" onclick="clearFormula()">Clear</button>
+            </div>
+          </div>
+
+          <div id="result2" class="result-display" style="display:none;"></div>
+        </div>
+      </div>
+
+      <!-- Comparative Simulation -->
+      <div id="content3" class="tab-content">
+        <div class="card">
+          <h2>Comparative Race</h2>
+          <p>Compare two objects racing! Set different speeds and see which one reaches the finish line first.</p>
+
+          <div class="track">
+            <div class="object" id="obj3a">A</div>
+            <div class="object" id="obj3b">B</div>
+          </div>
+
+          <div class="controls">
+            <div class="control-group">
+              <label>Object A Speed: <span class="label-value" id="speedA">6</span> m/s</label>
+              <input type="range" id="speed3a" min="1" max="15" value="6">
+            </div>
+
+            <div class="control-group">
+              <label>Object B Speed: <span class="label-value" id="speedB">10</span> m/s</label>
+              <input type="range" id="speed3b" min="1" max="15" value="10">
+            </div>
+
+            <div class="control-group">
+              <label>Race Distance: <span class="label-value" id="raceDistance">200</span> meters</label>
+              <input type="range" id="raceDist" min="100" max="500" value="200">
+            </div>
+
+            <div class="button-row">
+              <button class="btn success" onclick="startSim(3)">Start Race</button>
+              <button class="btn secondary" onclick="resetSim(3)">Reset</button>
+            </div>
+          </div>
+
+          <div id="result3" class="result-display" style="display:none;"></div>
+        </div>
+      </div>
     </div>
-    <div class="chat-input">
-      <input type="text" id="chatInput" placeholder="Ask a question...">
-      <button onclick="sendMsg()">Send</button>
+
+    <!-- Right Sidebar - Enhanced Chatbot -->
+    <div class="sidebar">
+      <div class="chatbot-card">
+        <div class="chatbot-header">
+          <h3>Learning Assistant</h3>
+        </div>
+        <div class="chatbot" id="chatbox">
+          <div class="chat-message">
+            <b>Assistant:</b> Welcome! I'm here to help you understand speed, distance, and time. Try the different simulations and ask me questions!
+          </div>
+        </div>
+        <div class="chat-input-container">
+          <div class="chat-input">
+            <input type="text" id="chatInput" placeholder="Ask about speed, distance, or time..." maxlength="200">
+            <button onclick="sendMsg()">Send</button>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </div>
 
 <script>
-let anim1, anim3;
-let pos1=0, pos3a=0, pos3b=0;
+  let anim1, anim3;
+  let pos1 = 0, pos3a = 0, pos3b = 0;
+  let currentTab = 1;
 
-// Tab switching
-function switchTab(tab) {
-  document.querySelectorAll('.tab-content').forEach(c => c.style.display = 'none');
-  document.getElementById('content'+tab).style.display = 'block';
-  document.querySelectorAll('.tabs button').forEach(b => b.classList.remove('active'));
-  document.getElementById('tab'+tab).classList.add('active');
-}
+  // Enhanced tab switching with animations
+  function switchTab(tab) {
+    // Update tab buttons
+    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+    document.getElementById('tab' + tab).classList.add('active');
 
-// Foundation Simulation
-document.getElementById('speed1').oninput = function() {
-  document.getElementById('speedVal1').textContent = this.value;
-}
-document.getElementById('dist1').oninput = function() {
-  document.getElementById('distVal1').textContent = this.value;
-}
+    // Update content with fade effect
+    document.querySelectorAll('.tab-content').forEach(content => {
+      content.classList.remove('active');
+    });
 
-function startSim(mode) {
-  if(mode===1){
-    let spd = parseInt(document.getElementById('speed1').value);
-    let dist = parseInt(document.getElementById('dist1').value);
-    let trackWidth = document.querySelector('#content1 .track').offsetWidth - 40;
-    let ppm = trackWidth / dist;
-    clearInterval(anim1);
-    anim1=setInterval(()=>{
-      pos1 += ppm*spd/10;
-      if(pos1>=trackWidth){pos1=trackWidth; clearInterval(anim1);}
-      document.getElementById('obj1').style.left=pos1+'px';
-    },100);
-  } else if(mode===3){
-    let spdA = parseInt(document.getElementById('speed3a').value);
-    let spdB = parseInt(document.getElementById('speed3b').value);
-    document.getElementById('speedA').textContent=spdA;
-    document.getElementById('speedB').textContent=spdB;
-    let trackWidth = document.querySelector('#content3 .track').offsetWidth - 40;
-    let ppm = trackWidth / 200;
-    clearInterval(anim3);
-    anim3=setInterval(()=>{
-      pos3a += ppm*spdA;
-      pos3b += ppm*spdB;
-      if(pos3a>=trackWidth || pos3b>=trackWidth){clearInterval(anim3);}
-      document.getElementById('obj3a').style.left=pos3a+'px';
-      document.getElementById('obj3b').style.left=pos3b+'px';
-    },100);
+    setTimeout(() => {
+      document.getElementById('content' + tab).classList.add('active');
+    }, 150);
+
+    currentTab = tab;
+
+    // Update chatbot context
+    updateChatbotContext(tab);
+
+    // Add haptic feedback for mobile
+    if (window.navigator?.vibrate) {
+      window.navigator.vibrate(10);
+    }
   }
-}
 
-function resetSim(mode) {
-  if(mode===1){
-    clearInterval(anim1); pos1=0;
-    document.getElementById('obj1').style.left='0px';
-  } else if(mode===3){
-    clearInterval(anim3); pos3a=0; pos3b=0;
-    document.getElementById('obj3a').style.left='0px';
-    document.getElementById('obj3b').style.left='0px';
+  // Update chatbot context based on current tab
+  function updateChatbotContext(tab) {
+    const contexts = {
+      1: "Now in Foundation mode. You can explore basic speed-distance relationships!",
+      2: "Now in Formula Discovery mode. Try calculating distance with different speed and time values!",
+      3: "Now in Comparative mode. Set up a race between two objects!"
+    };
+
+    addChatMessage('Assistant', contexts[tab]);
   }
-}
 
-// Formula Discovery Calculation
-function calcDistance(){
-  let s = parseFloat(document.getElementById('speed2').value);
-  let t = parseFloat(document.getElementById('time2').value);
-  document.getElementById('result2').textContent = "Distance = " + (s*t).toFixed(2) + " m";
-}
+  // Enhanced slider updates with smooth value display
+  function initializeSliders() {
+    // Foundation mode sliders
+    document.getElementById('speed1').oninput = function() {
+      document.getElementById('speedVal1').textContent = this.value;
+      updateSimulationStats(1);
+    };
 
-// Chatbot placeholder
-function sendMsg(){
-  let input=document.getElementById('chatInput').value.trim();
-  if(!input) return;
-  let box=document.getElementById('chatbox');
-  box.innerHTML+=`<p><b>You:</b> ${input}</p>`;
-  box.innerHTML+=`<p><b>Bot:</b> (Placeholder) I will guide you soon!</p>`;
-  document.getElementById('chatInput').value='';
-  box.scrollTop=box.scrollHeight;
-}
+    document.getElementById('dist1').oninput = function() {
+      document.getElementById('distVal1').textContent = this.value;
+      updateSimulationStats(1);
+    };
+
+    // Comparative mode sliders
+    document.getElementById('speed3a').oninput = function() {
+      document.getElementById('speedA').textContent = this.value;
+    };
+
+    document.getElementById('speed3b').oninput = function() {
+      document.getElementById('speedB').textContent = this.value;
+    };
+
+    document.getElementById('raceDist').oninput = function() {
+      document.getElementById('raceDistance').textContent = this.value;
+    };
+  }
+
+  // Update simulation statistics
+  function updateSimulationStats(mode) {
+    if (mode === 1) {
+      const speed = parseInt(document.getElementById('speed1').value);
+      const distance = parseInt(document.getElementById('dist1').value);
+      const time = (distance / speed).toFixed(2);
+
+      const result = document.getElementById('result1');
+      result.innerHTML = `<strong>Predicted Time:</strong> ${time} seconds<br><em>Click "Start Simulation" to see it in action!</em>`;
+      result.style.display = 'block';
+    }
+  }
+
+  // Enhanced simulation with improved animations
+  function startSim(mode) {
+    if (mode === 1) {
+      const speed = parseInt(document.getElementById('speed1').value);
+      const distance = parseInt(document.getElementById('dist1').value);
+      const trackWidth = document.querySelector('#content1 .track').offsetWidth - 70;
+      const time = distance / speed;
+      const pixelsPerSecond = trackWidth / time;
+
+      clearInterval(anim1);
+      pos1 = 0;
+
+      addChatMessage('Assistant', `Starting simulation: ${speed} m/s over ${distance}m will take ${time.toFixed(2)} seconds`);
+
+      anim1 = setInterval(() => {
+        pos1 += pixelsPerSecond / 10;
+        if (pos1 >= trackWidth) {
+          pos1 = trackWidth;
+          clearInterval(anim1);
+          showSimulationComplete(1, time);
+        }
+        document.getElementById('obj1').style.left = (20 + pos1) + 'px';
+      }, 100);
+
+    } else if (mode === 3) {
+      const speedA = parseInt(document.getElementById('speed3a').value);
+      const speedB = parseInt(document.getElementById('speed3b').value);
+      const raceDistance = parseInt(document.getElementById('raceDist').value);
+      const trackWidth = document.querySelector('#content3 .track').offsetWidth - 70;
+      const pixelsPerMeter = trackWidth / raceDistance;
+
+      document.getElementById('speedA').textContent = speedA;
+      document.getElementById('speedB').textContent = speedB;
+
+      clearInterval(anim3);
+      pos3a = 0;
+      pos3b = 0;
+
+      const timeA = raceDistance / speedA;
+      const timeB = raceDistance / speedB;
+
+      addChatMessage('Assistant', `Race started! Object A: ${timeA.toFixed(2)}s, Object B: ${timeB.toFixed(2)}s predicted times`);
+
+      anim3 = setInterval(() => {
+        pos3a += pixelsPerMeter * speedA / 10;
+        pos3b += pixelsPerMeter * speedB / 10;
+
+        if (pos3a >= trackWidth || pos3b >= trackWidth) {
+          clearInterval(anim3);
+          showRaceComplete(speedA, speedB, timeA, timeB);
+        }
+
+        document.getElementById('obj3a').style.left = (20 + Math.min(pos3a, trackWidth)) + 'px';
+        document.getElementById('obj3b').style.left = (20 + Math.min(pos3b, trackWidth)) + 'px';
+      }, 100);
+    }
+  }
+
+  // Show simulation completion
+  function showSimulationComplete(mode, time) {
+    const result = document.getElementById('result' + mode);
+    result.innerHTML = `
+      <strong>Simulation Complete!</strong><br>
+      Actual time: ${time.toFixed(2)} seconds<br>
+      <em>Distance = Speed × Time</em>
+    `;
+    result.style.display = 'block';
+
+    addChatMessage('Assistant', `Simulation finished! The object took exactly ${time.toFixed(2)} seconds as predicted.`);
+
+    // Add success haptic feedback
+    if (window.navigator?.vibrate) {
+      window.navigator.vibrate([50, 50, 50]);
+    }
+  }
+
+  // Show race completion
+  function showRaceComplete(speedA, speedB, timeA, timeB) {
+    const winner = timeA < timeB ? 'Object A' : timeB < timeA ? 'Object B' : 'Tie';
+    const result = document.getElementById('result3');
+
+    result.innerHTML = `
+      <strong>Race Complete!</strong><br>
+      Object A: ${timeA.toFixed(2)}s | Object B: ${timeB.toFixed(2)}s<br>
+      <em>${winner} ${winner !== 'Tie' ? 'wins!' : 'Perfect tie!'}</em>
+    `;
+    result.style.display = 'block';
+
+    addChatMessage('Assistant', `Race finished! ${winner} ${winner !== 'Tie' ? `won by ${Math.abs(timeA - timeB).toFixed(2)} seconds!` : 'Perfect tie!'}`);
+
+    // Add victory haptic feedback
+    if (window.navigator?.vibrate) {
+      window.navigator.vibrate([100, 50, 100, 50, 100]);
+    }
+  }
+
+  // Enhanced reset with animations
+  function resetSim(mode) {
+    if (mode === 1) {
+      clearInterval(anim1);
+      pos1 = 0;
+      document.getElementById('obj1').style.left = '20px';
+      document.getElementById('result1').style.display = 'none';
+      addChatMessage('Assistant', 'Foundation simulation reset. Ready for a new run!');
+    } else if (mode === 3) {
+      clearInterval(anim3);
+      pos3a = 0;
+      pos3b = 0;
+      document.getElementById('obj3a').style.left = '20px';
+      document.getElementById('obj3b').style.left = '20px';
+      document.getElementById('result3').style.display = 'none';
+      addChatMessage('Assistant', 'Race reset. Ready for another competition!');
+    }
+  }
+
+  // Enhanced formula calculation
+  function calcDistance() {
+    const speed = parseFloat(document.getElementById('speed2').value);
+    const time = parseFloat(document.getElementById('time2').value);
+
+    if (isNaN(speed) || isNaN(time) || speed <= 0 || time <= 0) {
+      showFormulaError('Please enter valid positive numbers for both speed and time!');
+      return;
+    }
+
+    const distance = speed * time;
+    const result = document.getElementById('result2');
+
+    result.innerHTML = `
+      <strong>Distance Calculated!</strong><br>
+      ${speed} m/s × ${time} s = ${distance.toFixed(2)} meters<br>
+      <em>Formula: Distance = Speed × Time</em>
+    `;
+    result.style.display = 'block';
+    result.className = 'result-display';
+
+    addChatMessage('Assistant', `Using the formula Distance = Speed × Time: ${speed} × ${time} = ${distance.toFixed(2)} meters`);
+  }
+
+  // Clear formula results
+  function clearFormula() {
+    document.getElementById('speed2').value = '';
+    document.getElementById('time2').value = '';
+    document.getElementById('result2').style.display = 'none';
+    addChatMessage('Assistant', 'Formula inputs cleared. Enter new values to calculate!');
+  }
+
+  // Show formula error
+  function showFormulaError(message) {
+    const result = document.getElementById('result2');
+    result.innerHTML = `<strong>Error:</strong> ${message}`;
+    result.style.display = 'block';
+    result.className = 'result-display';
+    result.style.background = 'rgba(239, 68, 68, 0.1)';
+    result.style.borderColor = '#ef4444';
+    result.style.color = '#ef4444';
+  }
+
+  // Enhanced chatbot functionality
+  function addChatMessage(sender, message) {
+    const chatbox = document.getElementById('chatbox');
+    const messageDiv = document.createElement('div');
+    messageDiv.className = 'chat-message';
+    messageDiv.innerHTML = `<b>${sender}:</b> ${message}`;
+    chatbox.appendChild(messageDiv);
+    chatbox.scrollTop = chatbox.scrollHeight;
+  }
+
+  // Enhanced message sending
+  function sendMsg() {
+    const input = document.getElementById('chatInput');
+    const message = input.value.trim();
+
+    if (!message) return;
+
+    addChatMessage('You', message);
+    input.value = '';
+
+    // Simple response system based on keywords
+    setTimeout(() => {
+      const response = generateChatbotResponse(message.toLowerCase());
+      addChatMessage('Assistant', response);
+    }, 500);
+  }
+
+  // Generate contextual chatbot responses
+  function generateChatbotResponse(message) {
+    // Speed-related questions
+    if (message.includes('speed') || message.includes('fast') || message.includes('velocity')) {
+      return 'Speed is how fast something moves! It\'s measured in meters per second (m/s). Higher speed means covering more distance in less time.';
+    }
+
+    // Distance-related questions
+    if (message.includes('distance') || message.includes('far') || message.includes('length')) {
+      return 'Distance is how far something travels, measured in meters. Remember: Distance = Speed × Time!';
+    }
+
+    // Time-related questions
+    if (message.includes('time') || message.includes('long') || message.includes('duration')) {
+      return 'Time is how long it takes to complete a journey, measured in seconds. To find time: Time = Distance ÷ Speed.';
+    }
+
+    // Formula questions
+    if (message.includes('formula') || message.includes('equation') || message.includes('calculate')) {
+      return 'The key formulas are: Distance = Speed × Time, Speed = Distance ÷ Time, and Time = Distance ÷ Speed. Try the Formula Discovery tab!';
+    }
+
+    // Help questions
+    if (message.includes('help') || message.includes('how') || message.includes('what')) {
+      const modes = ['Foundation mode: Learn basic concepts', 'Formula Discovery: Calculate missing values', 'Comparative mode: Race two objects'];
+      return `Here are the available modes: ${modes[currentTab - 1]}. Try the different simulations and ask specific questions!`;
+    }
+
+    // Default responses
+    const responses = [
+      'That\'s an interesting question! Try running a simulation to see the relationship in action.',
+      'Great observation! The simulations help visualize how speed, distance, and time work together.',
+      'Keep exploring! Each mode teaches different aspects of motion physics.',
+      'Try adjusting the sliders to see how changing one value affects the others!'
+    ];
+
+    return responses[Math.floor(Math.random() * responses.length)];
+  }
+
+  // Enhanced keyboard support
+  document.addEventListener('keydown', (e) => {
+    // Enter key in chat input
+    if (e.key === 'Enter' && document.activeElement.id === 'chatInput') {
+      sendMsg();
+    }
+
+    // Number keys for tab switching
+    if (e.key >= '1' && e.key <= '3') {
+      switchTab(parseInt(e.key));
+    }
+
+    // Space bar to start simulation in current mode
+    if (e.key === ' ' && !document.activeElement.matches('input')) {
+      e.preventDefault();
+      if (currentTab === 1 || currentTab === 3) {
+        startSim(currentTab);
+      }
+    }
+  });
+
+  // Enhanced touch and interaction handling
+  function initializeInteractions() {
+    // Add loading states to buttons
+    document.querySelectorAll('.btn').forEach(btn => {
+      btn.addEventListener('click', function() {
+        this.classList.add('loading');
+        setTimeout(() => {
+          this.classList.remove('loading');
+        }, 1000);
+      });
+    });
+
+    // Add hover effects to objects
+    document.querySelectorAll('.object').forEach(obj => {
+      obj.addEventListener('mouseenter', () => {
+        obj.style.transform = 'scale(1.1)';
+      });
+
+      obj.addEventListener('mouseleave', () => {
+        obj.style.transform = 'scale(1)';
+      });
+    });
+
+    // Prevent zoom on input focus (iOS fix)
+    document.querySelectorAll('input').forEach(input => {
+      input.addEventListener('focus', () => {
+        input.style.fontSize = '16px';
+      });
+    });
+  }
+
+  // Initialize everything when DOM is ready
+  function initializeApp() {
+    initializeSliders();
+    initializeInteractions();
+    updateSimulationStats(1);
+
+    // Welcome message
+    setTimeout(() => {
+      addChatMessage('Assistant', 'Welcome! I\'m ready to help you learn. Try the Foundation simulation first!');
+    }, 1000);
+  }
+
+  // Start the application
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initializeApp);
+  } else {
+    initializeApp();
+  }
+
+  // Handle orientation changes
+  window.addEventListener('orientationchange', () => {
+    setTimeout(() => {
+      // Reset object positions after orientation change
+      if (pos1 > 0) resetSim(1);
+      if (pos3a > 0 || pos3b > 0) resetSim(3);
+    }, 100);
+  });
 </script>
-
 </body>
 </html>

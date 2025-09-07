@@ -2,997 +2,1677 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no" />
-  <title>Race Story — Learn Speed · Distance · Time</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no,viewport-fit=cover" />
+  <title>Race Story - Learn Speed · Distance · Time</title>
 
-  <!-- Chart.js for small graphs -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Chart.js for visualizations -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js" crossorigin="anonymous"></script>
 
   <style>
     :root{
-      --bg:#f6fbff; --card:#fff; --accent:#0b74da; --muted:#556;
-      --good:#1f9d55; --warn:#f6a623; --bad:#d64545;
+      --primary: #6366f1;
+      --primary-dark: #4f46e5;
+      --primary-light: #a5b4fc;
+      --secondary: #f59e0b;
+      --success: #10b981;
+      --danger: #ef4444;
+      --warning: #f59e0b;
+      --surface: #ffffff;
+      --surface-alt: #f8fafc;
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --text-light: #94a3b8;
+      --border: #e2e8f0;
+      --shadow: 0 1px 3px 0 rgba(0,0,0,0.1);
+      --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1);
+      --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1);
+      --radius: 12px;
+      --radius-lg: 16px;
+      --spacing: 16px;
     }
-    *{box-sizing:border-box}
-    body{
-      margin:0;
-      font-family:Inter,system-ui,Segoe UI,Roboto,Arial;
-      background:var(--bg);
-      color:#0b1220;
-      font-size:16px;
-      line-height:1.4;
-      -webkit-text-size-adjust: 100%;
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --surface: #1e293b;
+        --surface-alt: #334155;
+        --text: #f1f5f9;
+        --text-muted: #94a3b8;
+        --text-light: #64748b;
+        --border: #475569;
+      }
+    }
+
+    *{
+      box-sizing: border-box;
       -webkit-tap-highlight-color: transparent;
+      -webkit-touch-callout: none;
     }
 
+    body{
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Inter, sans-serif;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+      color: var(--text);
+      font-size: 16px;
+      line-height: 1.6;
+      -webkit-text-size-adjust: 100%;
+      -webkit-font-smoothing: antialiased;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Modern glass header */
     header{
-      background:linear-gradient(90deg,var(--accent),#2aa0f3);
-      color:white;
-      padding:12px 16px;
-      position:sticky;
-      top:0;
-      z-index:100;
-      box-shadow:0 2px 8px rgba(0,0,0,0.1);
+      background: rgba(255,255,255,0.1);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(255,255,255,0.2);
+      color: white;
+      padding: 20px 24px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 4px 32px rgba(0,0,0,0.1);
     }
+
     header h1{
-      margin:0;
-      font-size:18px;
-      font-weight:600;
+      margin: 0;
+      font-size: 20px;
+      font-weight: 700;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      letter-spacing: -0.025em;
     }
 
+    /* Container with improved spacing */
     .app{
-      display:flex;
-      flex-direction:column;
-      min-height:calc(100vh - 60px);
-      padding:12px;
-      gap:12px;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 20px;
+      padding: 24px;
+      max-width: 1200px;
+      margin: 0 auto;
     }
 
-    .main{
-      order:1;
-      display:flex;
-      flex-direction:column;
-      gap:12px;
+    /* Card system with enhanced design */
+    .card{
+      background: var(--surface);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      box-shadow: var(--shadow-lg);
+      border: 1px solid var(--border);
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
-    .side{
-      order:2;
-      display:flex;
-      flex-direction:column;
-      gap:12px;
+    .card:hover{
+      transform: translateY(-2px);
+      box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);
     }
 
+    .card::before{
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--primary), var(--primary-light));
+    }
+
+    /* Enhanced tab system */
     .tabs{
-      display:flex;
-      gap:6px;
-      overflow-x:auto;
-      padding-bottom:4px;
+      display: flex;
+      gap: 8px;
+      margin-bottom: 20px;
+      padding: 4px;
+      background: var(--surface-alt);
+      border-radius: var(--radius);
+      overflow-x: auto;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+
+    .tabs::-webkit-scrollbar{
+      display: none;
     }
 
     .tab-btn{
-      padding:12px 16px;
-      border-radius:12px;
-      border:none;
-      background:rgba(0,0,0,0.06);
-      cursor:pointer;
-      font-size:14px;
-      font-weight:500;
-      white-space:nowrap;
-      min-width:120px;
-      text-align:center;
-      transition:all 0.2s;
+      padding: 12px 20px;
+      border-radius: 8px;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 600;
+      white-space: nowrap;
+      min-width: 120px;
+      text-align: center;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      color: var(--text-muted);
+      position: relative;
     }
 
     .tab-btn.active{
-      background:var(--card);
-      box-shadow:0 4px 12px rgba(11,116,218,0.15);
-      color:var(--accent);
-      transform:translateY(-1px);
+      background: var(--surface);
+      color: var(--primary);
+      box-shadow: var(--shadow-md);
+      transform: translateY(-1px);
     }
 
-    .card{
-      background:var(--card);
-      border-radius:16px;
-      padding:16px;
-      box-shadow:0 2px 8px rgba(20,30,60,0.06);
-      border:1px solid rgba(11,116,218,0.08);
+    .tab-btn:not(.active):hover{
+      background: rgba(99, 102, 241, 0.1);
+      color: var(--primary);
     }
 
+    /* Enhanced track visualization */
     .track{
-      height:120px;
-      border-radius:12px;
-      background:linear-gradient(90deg,#eee,#ddd);
-      position:relative;
-      overflow:hidden;
-      border:2px solid #e2e8f0;
-      margin:12px 0;
+      height: 140px;
+      border-radius: var(--radius);
+      background: linear-gradient(180deg, #f1f5f9 0%, #e2e8f0 100%);
+      position: relative;
+      overflow: hidden;
+      border: 2px solid var(--border);
+      margin: 20px 0;
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .track::before{
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 20px;
+      right: 20px;
+      height: 2px;
+      background: repeating-linear-gradient(
+        90deg,
+        var(--text-muted) 0px,
+        var(--text-muted) 10px,
+        transparent 10px,
+        transparent 20px
+      );
+      transform: translateY(-50%);
+      opacity: 0.3;
     }
 
     .runner{
-      position:absolute;
-      width:44px;
-      height:44px;
-      border-radius:12px;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      font-weight:700;
-      color:white;
-      box-shadow:0 4px 12px rgba(20,30,60,0.15);
-      font-size:16px;
+      position: absolute;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      color: white;
+      box-shadow: var(--shadow-lg);
+      font-size: 18px;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      border: 3px solid rgba(255,255,255,0.3);
     }
 
-    .runner.riya{background:#ff6b6b;top:15px}
-    .runner.arjun{background:#4f8cff;top:60px}
+    .runner:hover{
+      transform: scale(1.1);
+    }
 
+    .runner.riya{
+      background: linear-gradient(135deg, #ef4444, #dc2626);
+      top: 20px;
+    }
+
+    .runner.arjun{
+      background: linear-gradient(135deg, #3b82f6, #2563eb);
+      top: 70px;
+    }
+
+    /* Enhanced controls */
     .controls{
-      display:flex;
-      flex-direction:column;
-      gap:16px;
-      margin:16px 0;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      margin: 24px 0;
     }
 
     .control-group{
-      background:rgba(11,116,218,0.03);
-      padding:14px;
-      border-radius:12px;
-      border:1px solid rgba(11,116,218,0.1);
+      background: var(--surface-alt);
+      padding: 20px;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      transition: all 0.2s ease;
+    }
+
+    .control-group:focus-within{
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
     }
 
     label{
-      font-size:14px;
-      color:var(--muted);
-      display:block;
-      margin-bottom:8px;
-      font-weight:500;
+      font-size: 14px;
+      color: var(--text-muted);
+      display: block;
+      margin-bottom: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.025em;
     }
 
     .label-value{
-      color:var(--accent);
-      font-weight:600;
-      font-size:16px;
+      color: var(--primary);
+      font-weight: 700;
+      font-size: 18px;
+      text-transform: none;
+      letter-spacing: normal;
     }
 
+    /* Modern slider design */
     input[type=range]{
-      width:100%;
-      height:6px;
-      border-radius:3px;
-      background:#e2e8f0;
-      outline:none;
-      -webkit-appearance:none;
-      margin:8px 0;
+      width: 100%;
+      height: 6px;
+      border-radius: 3px;
+      background: var(--border);
+      outline: none;
+      -webkit-appearance: none;
+      margin: 12px 0;
+      position: relative;
+    }
+
+    input[type=range]::-webkit-slider-track{
+      height: 6px;
+      border-radius: 3px;
+      background: var(--border);
     }
 
     input[type=range]::-webkit-slider-thumb{
-      -webkit-appearance:none;
-      width:24px;
-      height:24px;
-      border-radius:50%;
-      background:var(--accent);
-      cursor:pointer;
-      box-shadow:0 2px 8px rgba(11,116,218,0.3);
+      -webkit-appearance: none;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: var(--primary);
+      cursor: pointer;
+      box-shadow: var(--shadow-md);
+      transition: all 0.2s ease;
+      border: 2px solid var(--surface);
+    }
+
+    input[type=range]::-webkit-slider-thumb:hover{
+      transform: scale(1.2);
+      box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
     }
 
     input[type=range]::-moz-range-thumb{
-      width:24px;
-      height:24px;
-      border-radius:50%;
-      background:var(--accent);
-      cursor:pointer;
-      border:none;
-      box-shadow:0 2px 8px rgba(11,116,218,0.3);
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: var(--primary);
+      cursor: pointer;
+      border: 2px solid var(--surface);
+      box-shadow: var(--shadow-md);
     }
 
+    /* Enhanced form inputs */
     input[type=number], select{
-      width:100%;
-      padding:12px;
-      border-radius:8px;
-      border:2px solid #e6eefc;
-      font-size:16px;
-      background:white;
-      transition:border-color 0.2s;
+      width: 100%;
+      padding: 16px;
+      border-radius: var(--radius);
+      border: 2px solid var(--border);
+      font-size: 16px;
+      background: var(--surface);
+      color: var(--text);
+      transition: all 0.2s ease;
+      font-weight: 500;
     }
 
     input[type=number]:focus, select:focus{
-      outline:none;
-      border-color:var(--accent);
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
     }
 
-    .row{
-      display:flex;
-      gap:8px;
-      align-items:center;
-      flex-wrap:wrap;
-    }
-
+    /* Modern button system */
     .btn{
-      padding:12px 20px;
-      border-radius:12px;
-      border:none;
-      background:var(--accent);
-      color:white;
-      cursor:pointer;
-      font-size:16px;
-      font-weight:600;
-      transition:all 0.2s;
-      min-height:48px;
-      touch-action:manipulation;
+      padding: 16px 24px;
+      border-radius: var(--radius);
+      border: none;
+      background: var(--primary);
+      color: white;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: 600;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      min-height: 52px;
+      touch-action: manipulation;
+      position: relative;
+      overflow: hidden;
+      text-transform: uppercase;
+      letter-spacing: 0.025em;
+    }
+
+    .btn::before{
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+      transition: left 0.5s;
+    }
+
+    .btn:hover::before{
+      left: 100%;
+    }
+
+    .btn:hover{
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px rgba(99, 102, 241, 0.4);
     }
 
     .btn:active{
-      transform:scale(0.98);
+      transform: translateY(0);
     }
 
     .btn.secondary{
-      background:#fff;
-      border:2px solid #cfe6ff;
-      color:var(--accent);
+      background: var(--surface);
+      border: 2px solid var(--primary);
+      color: var(--primary);
+    }
+
+    .btn.success{
+      background: var(--success);
+    }
+
+    .btn.warning{
+      background: var(--warning);
+    }
+
+    .btn.danger{
+      background: var(--danger);
     }
 
     .btn.full{
-      width:100%;
-      margin:8px 0;
+      width: 100%;
+      margin: 12px 0;
     }
 
-    .muted{
-      color:var(--muted);
-      font-size:14px;
-    }
-
-    .story{
-      min-height:80px;
-    }
-
-    .predict-box{
-      display:flex;
-      flex-direction:column;
-      gap:12px;
-      margin-top:12px;
-    }
-
-    .predict-row{
-      display:flex;
-      gap:8px;
-    }
-
+    /* Enhanced feedback system */
     .feedback{
-      margin-top:12px;
-      font-weight:600;
-      padding:12px;
-      border-radius:8px;
-      background:rgba(0,0,0,0.02);
-      font-size:14px;
+      margin-top: 16px;
+      font-weight: 600;
+      padding: 16px;
+      border-radius: var(--radius);
+      font-size: 14px;
+      border-left: 4px solid var(--primary);
+      position: relative;
+      animation: slideIn 0.3s ease;
     }
 
-    canvas{
-      background:white;
-      border-radius:12px;
-      padding:8px;
-      width:100% !important;
-      max-height:200px;
+    @keyframes slideIn{
+      from{
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to{
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
-    .small{
-      font-size:14px;
-      color:var(--muted);
+    .feedback.success{
+      background: rgba(16, 185, 129, 0.1);
+      border-left-color: var(--success);
+      color: var(--success);
     }
 
+    .feedback.warning{
+      background: rgba(245, 158, 11, 0.1);
+      border-left-color: var(--warning);
+      color: var(--warning);
+    }
+
+    .feedback.error{
+      background: rgba(239, 68, 68, 0.1);
+      border-left-color: var(--danger);
+      color: var(--danger);
+    }
+
+    /* Enhanced statistics display */
     .stats-row{
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      margin:12px 0;
-      padding:12px;
-      background:rgba(11,116,218,0.03);
-      border-radius:8px;
-      flex-wrap:wrap;
-      gap:8px;
+      display: grid;
+      grid-template-columns: 1fr 1fr auto;
+      gap: 16px;
+      align-items: center;
+      margin: 20px 0;
+      padding: 20px;
+      background: var(--surface-alt);
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
     }
 
     .stat{
-      font-size:14px;
-      color:var(--muted);
+      font-size: 14px;
+      color: var(--text-muted);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.025em;
     }
 
     .stat-value{
-      font-weight:600;
-      color:var(--accent);
+      font-weight: 800;
+      color: var(--primary);
+      font-size: 18px;
+      display: block;
+      margin-top: 4px;
     }
 
-    footer{
-      padding:16px;
-      text-align:center;
-      color:var(--muted);
-      font-size:14px;
-      border-top:1px solid #e2e8f0;
-      margin-top:20px;
+    /* Enhanced chart container */
+    .chart-container{
+      margin-top: 24px;
+      padding: 20px;
+      background: var(--surface-alt);
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
     }
 
+    .chart-container h4{
+      margin: 0 0 16px 0;
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text);
+      text-transform: uppercase;
+      letter-spacing: 0.025em;
+    }
+
+    canvas{
+      background: var(--surface);
+      border-radius: 8px;
+      width: 100% !important;
+      max-height: 200px;
+      box-shadow: var(--shadow);
+    }
+
+    /* Typography improvements */
     h2{
-      margin:0 0 8px 0;
-      font-size:20px;
-      font-weight:600;
-      color:#0b1220;
+      margin: 0 0 12px 0;
+      font-size: 24px;
+      font-weight: 800;
+      color: var(--text);
+      letter-spacing: -0.025em;
     }
 
     h3{
-      margin:0 0 12px 0;
-      font-size:18px;
-      font-weight:600;
-      color:#0b1220;
+      margin: 0 0 16px 0;
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: -0.025em;
     }
 
     h4{
-      margin:8px 0;
-      font-size:16px;
-      font-weight:600;
-      color:var(--muted);
+      margin: 12px 0;
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--text-muted);
     }
 
-    ul{
-      margin:8px 0;
-      padding-left:20px;
+    /* Enhanced prediction boxes */
+    .predict-box{
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      margin-top: 16px;
+      padding: 20px;
+      background: rgba(99, 102, 241, 0.05);
+      border-radius: var(--radius);
+      border: 2px dashed var(--primary-light);
     }
 
-    li{
-      margin:4px 0;
-      line-height:1.4;
+    .predict-row{
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 12px;
     }
 
-    /* Progress section optimization for mobile */
+    /* Enhanced story section */
+    .story{
+      min-height: 120px;
+      padding: 24px;
+      background: linear-gradient(135deg, var(--primary-light), var(--primary));
+      color: white;
+      border-radius: var(--radius-lg);
+    }
+
+    .story h3{
+      color: white;
+      margin-bottom: 16px;
+    }
+
+    /* Formula display */
+    .formula-display{
+      background: var(--surface-alt);
+      padding: 20px;
+      margin: 16px 0;
+      border-radius: var(--radius);
+      font-family: 'SF Mono', Monaco, monospace;
+      font-size: 16px;
+      border-left: 4px solid var(--primary);
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    /* Progress section */
     .progress-item{
-      margin-bottom:8px;
-      padding:8px;
-      background:rgba(0,0,0,0.02);
-      border-radius:6px;
-      font-size:12px;
-      word-break:break-all;
+      margin-bottom: 12px;
+      padding: 16px;
+      background: var(--surface-alt);
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      font-size: 14px;
+      transition: all 0.2s ease;
     }
 
-    /* Chart container */
-    .chart-container{
-      margin-top:16px;
-      position:relative;
+    .progress-item:hover{
+      transform: translateX(4px);
+      box-shadow: var(--shadow-md);
     }
 
-    /* Touch improvements */
-    .touch-target{
-      min-height:44px;
-      min-width:44px;
+    /* Loading states */
+    .loading{
+      position: relative;
+      overflow: hidden;
     }
 
-    /* Better spacing for mobile */
-    @media (max-width: 480px) {
+    .loading::after{
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+      animation: shimmer 1.5s infinite;
+    }
+
+    @keyframes shimmer{
+      0%{ left: -100%; }
+      100%{ left: 100%; }
+    }
+
+    /* Mobile optimizations */
+    @media (max-width: 768px) {
       .app{
-        padding:8px;
+        padding: 16px;
+        gap: 16px;
       }
 
       .card{
-        padding:12px;
+        padding: 20px;
       }
 
       header{
-        padding:10px 12px;
+        padding: 16px 20px;
       }
 
       header h1{
-        font-size:16px;
+        font-size: 18px;
       }
 
       .track{
-        height:100px;
+        height: 120px;
       }
 
       .runner{
-        width:36px;
-        height:36px;
-        font-size:14px;
+        width: 44px;
+        height: 44px;
+        font-size: 16px;
       }
 
-      .runner.riya{top:12px}
-      .runner.arjun{top:52px}
+      .runner.riya{
+        top: 16px;
+      }
+
+      .runner.arjun{
+        top: 60px;
+      }
 
       .btn{
-        padding:10px 16px;
-        font-size:15px;
+        padding: 14px 20px;
+        font-size: 15px;
+        min-height: 48px;
       }
 
       .tab-btn{
-        padding:10px 12px;
-        min-width:100px;
-        font-size:13px;
+        padding: 12px 16px;
+        min-width: 100px;
+        font-size: 13px;
+      }
+
+      .stats-row{
+        grid-template-columns: 1fr;
+        gap: 12px;
+        text-align: center;
+      }
+
+      h2{
+        font-size: 22px;
+      }
+
+      h3{
+        font-size: 18px;
+      }
+    }
+
+    /* Accessibility improvements */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+
+    /* Focus indicators */
+    button:focus-visible, input:focus-visible, select:focus-visible {
+      outline: 2px solid var(--primary);
+      outline-offset: 2px;
+    }
+
+    /* High contrast mode support */
+    @media (prefers-contrast: high) {
+      .card {
+        border-width: 2px;
+      }
+
+      .btn {
+        border: 2px solid currentColor;
       }
     }
   </style>
 </head>
 <body>
-<header><h1>Riya vs Arjun — Race Story: Speed, Distance & Time</h1></header>
+<header>
+  <h1>Race Story: Speed, Distance & Time</h1>
+</header>
 
 <div class="app">
-  <div class="main">
-    <!-- Tabs -->
-    <div class="card">
-      <div class="tabs">
-        <button class="tab-btn active touch-target" id="tabDistance">Distance Mode</button>
-        <button class="tab-btn touch-target" id="tabSpeed">Speed Mode</button>
-        <button class="tab-btn touch-target" id="tabFormula">Formula Puzzle</button>
-      </div>
+  <!-- Enhanced Tab Navigation -->
+  <div class="card">
+    <div class="tabs">
+      <button class="tab-btn active" id="tabDistance" role="tab" aria-selected="true">
+        Distance Mode
+      </button>
+      <button class="tab-btn" id="tabSpeed" role="tab" aria-selected="false">
+        Speed Challenge
+      </button>
+      <button class="tab-btn" id="tabFormula" role="tab" aria-selected="false">
+        Formula Puzzle
+      </button>
+    </div>
+  </div>
+
+  <!-- Distance Mode Panel -->
+  <div class="card" id="panelDistance" role="tabpanel">
+    <h2>Distance Discovery</h2>
+    <p>Riya and Arjun start together. Control their speeds and predict who travels farther in the time window!</p>
+
+    <div class="track" id="trackD" aria-label="Race track showing runner positions">
+      <div class="runner riya" id="riyaD" style="left:20px" aria-label="Riya's position">R</div>
+      <div class="runner arjun" id="arjunD" style="left:20px" aria-label="Arjun's position">A</div>
     </div>
 
-    <!-- Distance Mode -->
-    <div class="card" id="panelDistance">
-      <h2>Distance Discovery — who travels farther?</h2>
-      <p class="small">Story: Riya and Arjun start together. You control speeds — who covers more distance in the time window?</p>
-
-      <div class="track" id="trackD">
-        <div class="runner riya" id="riyaD" style="left:8px">R</div>
-        <div class="runner arjun" id="arjunD" style="left:8px">A</div>
-      </div>
-
-      <div class="controls">
-        <div class="control-group">
-          <label>Riya's speed (m/s): <span class="label-value" id="spdR_D">5</span></label>
-          <input type="range" id="spdR_D_range" min="0.5" max="15" step="0.1" value="5">
-        </div>
-
-        <div class="control-group">
-          <label>Arjun's speed (m/s): <span class="label-value" id="spdA_D">7</span></label>
-          <input type="range" id="spdA_D_range" min="0.5" max="15" step="0.1" value="7">
-        </div>
-
-        <div class="control-group">
-          <label>Time window (seconds): <span class="label-value" id="timeWindow_D">10</span></label>
-          <input type="range" id="timeWindow_D_range" min="2" max="30" step="1" value="10">
-        </div>
-
-        <div class="control-group">
-          <label>Prediction: Who travels farther in the window?</label>
-          <div class="predict-box">
-            <select id="predictWho_D" class="touch-target">
-              <option value="Riya">Riya</option>
-              <option value="Arjun">Arjun</option>
-              <option value="Tie">Tie</option>
-            </select>
-            <div class="predict-row">
-              <button class="btn touch-target" id="checkPred_D" style="flex:1">Check Prediction</button>
-              <button class="btn secondary touch-target" id="resetD">Reset</button>
-            </div>
-          </div>
-          <div id="feedbackD" class="feedback muted"></div>
-        </div>
-      </div>
-
-      <div class="stats-row">
-        <div class="stat">Riya: <span class="stat-value" id="distR_D">0</span> m</div>
-        <div class="stat">Arjun: <span class="stat-value" id="distA_D">0</span> m</div>
-        <button class="btn touch-target" id="runD">Simulate</button>
-      </div>
-
-      <div class="chart-container card">
-        <h4>Distance vs Time</h4>
-        <canvas id="chartD" height="120"></canvas>
-      </div>
-    </div>
-
-    <!-- Speed Mode -->
-    <div class="card" id="panelSpeed" style="display:none">
-      <h2>Speed Challenge — same distance, who wins?</h2>
-      <p class="small">Story: They race same distance. Find the minimum speed needed to beat the other runner.</p>
-
-      <div class="track" id="trackS">
-        <div class="runner riya" id="riyaS" style="left:8px">R</div>
-        <div class="runner arjun" id="arjunS" style="left:8px">A</div>
-      </div>
-
-      <div class="controls">
-        <div class="control-group">
-          <label>Race distance (meters): <span class="label-value" id="raceDist_S">150</span></label>
-          <input type="range" id="raceDist_S_range" min="30" max="600" step="5" value="150">
-        </div>
-
-        <div class="control-group">
-          <label>Riya's speed (m/s): <span class="label-value" id="spdR_S">6</span></label>
-          <input type="range" id="spdR_S_range" min="0.5" max="20" step="0.1" value="6">
-        </div>
-
-        <div class="control-group">
-          <label>Arjun's speed (m/s): <span class="label-value" id="spdA_S">6</span></label>
-          <input type="range" id="spdA_S_range" min="0.5" max="20" step="0.1" value="6">
-        </div>
-
-        <div class="control-group">
-          <label>Prediction: Minimum speed for Riya to beat Arjun?</label>
-          <div class="predict-box">
-            <input type="number" id="predictSpeed_S" placeholder="Enter speed in m/s" class="touch-target" />
-            <div class="predict-row">
-              <button class="btn touch-target" id="checkPred_S" style="flex:1">Check Prediction</button>
-              <button class="btn secondary touch-target" id="resetS">Reset</button>
-            </div>
-          </div>
-          <div id="feedbackS" class="feedback muted"></div>
-        </div>
-      </div>
-
-      <div class="stats-row">
-        <div class="stat">Riya time: <span class="stat-value" id="timeR_S">0</span> s</div>
-        <div class="stat">Arjun time: <span class="stat-value" id="timeA_S">0</span> s</div>
-        <button class="btn touch-target" id="runS">Simulate Race</button>
-      </div>
-
-      <div class="chart-container card">
-        <h4>Distance vs Time (race)</h4>
-        <canvas id="chartS" height="120"></canvas>
-      </div>
-    </div>
-
-    <!-- Formula Puzzle -->
-    <div class="card" id="panelFormula" style="display:none">
-      <h2>Formula Puzzle — find the missing variable</h2>
-      <p class="small">Story: Fill two values and solve the third using Speed = Distance ÷ Time.</p>
-
-      <div class="controls">
-        <div class="control-group">
-          <label>Hide which variable?</label>
-          <select id="hideVarF" class="touch-target">
-            <option value="speed">Hide Speed</option>
-            <option value="distance">Hide Distance</option>
-            <option value="time">Hide Time</option>
-          </select>
-        </div>
-
-        <div class="control-group">
-          <label>Speed (m/s)</label>
-          <input type="number" id="speedF" step="0.1" value="5" class="touch-target">
-        </div>
-
-        <div class="control-group">
-          <label>Distance (meters)</label>
-          <input type="number" id="distanceF" step="0.1" value="120" class="touch-target">
-        </div>
-
-        <div class="control-group">
-          <label>Time (seconds)</label>
-          <input type="number" id="timeF" step="0.1" value="24" class="touch-target">
-        </div>
+    <div class="controls">
+      <div class="control-group">
+        <label for="spdR_D_range">
+          Riya's Speed: <span class="label-value" id="spdR_D">5.0</span> m/s
+        </label>
+        <input type="range" id="spdR_D_range" min="0.5" max="15" step="0.1" value="5"
+               aria-label="Adjust Riya's speed">
       </div>
 
       <div class="control-group">
-        <label>Make your prediction for the hidden value</label>
+        <label for="spdA_D_range">
+          Arjun's Speed: <span class="label-value" id="spdA_D">7.0</span> m/s
+        </label>
+        <input type="range" id="spdA_D_range" min="0.5" max="15" step="0.1" value="7"
+               aria-label="Adjust Arjun's speed">
+      </div>
+
+      <div class="control-group">
+        <label for="timeWindow_D_range">
+          Time Window: <span class="label-value" id="timeWindow_D">10</span> seconds
+        </label>
+        <input type="range" id="timeWindow_D_range" min="2" max="30" step="1" value="10"
+               aria-label="Adjust time window">
+      </div>
+          <div class="stats-row">
+      <div class="stat">
+        Riya Distance
+        <span class="stat-value" id="distR_D">0.00 m</span>
+      </div>
+      <div class="stat">
+        Arjun Distance
+        <span class="stat-value" id="distA_D">0.00 m</span>
+      </div>
+      <button class="btn success" id="runD">Start Simulation</button>
+    </div>
+      <div class="control-group">
+        <label for="predictWho_D">Make your prediction</label>
         <div class="predict-box">
-          <input type="number" id="predictF" placeholder="Your guess" class="touch-target" />
+          <select id="predictWho_D" aria-label="Predict who travels farther">
+            <option value="Riya">Riya travels farther</option>
+            <option value="Arjun" selected>Arjun travels farther</option>
+            <option value="Tie">They travel the same distance</option>
+          </select>
           <div class="predict-row">
-            <button class="btn touch-target" id="checkF" style="flex:1">Check</button>
-            <button class="btn secondary touch-target" id="revealF">Reveal</button>
+            <button class="btn" id="checkPred_D">Check Prediction</button>
+            <button class="btn secondary" id="resetD">Reset</button>
           </div>
         </div>
-        <div id="feedbackF" class="feedback muted"></div>
-        <div class="small" style="margin-top:12px;padding:8px;background:rgba(31,157,85,0.1);border-radius:6px;">
-          <strong>Formulas:</strong><br>
-          Speed = Distance ÷ Time<br>
-          Distance = Speed × Time<br>
-          Time = Distance ÷ Speed
+        <div id="feedbackD" class="feedback" role="alert" aria-live="polite"></div>
+      </div>
+    </div>
+
+
+
+    <div class="chart-container">
+      <h4>Distance vs Time Graph</h4>
+      <canvas id="chartD" height="200" aria-label="Chart showing distance over time for both runners"></canvas>
+    </div>
+  </div>
+
+  <!-- Speed Mode Panel -->
+  <div class="card" id="panelSpeed" style="display:none" role="tabpanel">
+    <h2>Speed Challenge</h2>
+    <p>They race the same distance. Find the minimum speed needed for Riya to beat Arjun!</p>
+
+    <div class="track" id="trackS" aria-label="Race track for speed challenge">
+      <div class="runner riya" id="riyaS" style="left:20px" aria-label="Riya's position">R</div>
+      <div class="runner arjun" id="arjunS" style="left:20px" aria-label="Arjun's position">A</div>
+    </div>
+
+    <div class="controls">
+      <div class="control-group">
+        <label for="raceDist_S_range">
+          Race Distance: <span class="label-value" id="raceDist_S">150</span> meters
+        </label>
+        <input type="range" id="raceDist_S_range" min="30" max="600" step="5" value="150"
+               aria-label="Set race distance">
+      </div>
+
+      <div class="control-group">
+        <label for="spdR_S_range">
+          Riya's Speed: <span class="label-value" id="spdR_S">6.0</span> m/s
+        </label>
+        <input type="range" id="spdR_S_range" min="0.5" max="20" step="0.1" value="6"
+               aria-label="Set Riya's speed">
+      </div>
+
+      <div class="control-group">
+        <label for="spdA_S_range">
+          Arjun's Speed: <span class="label-value" id="spdA_S">8.0</span> m/s
+        </label>
+        <input type="range" id="spdA_S_range" min="0.5" max="20" step="0.1" value="8"
+               aria-label="Set Arjun's speed">
+      </div>
+
+      <div class="control-group">
+        <label for="predictSpeed_S">Predict minimum speed for Riya to win</label>
+        <div class="predict-box">
+          <input type="number" id="predictSpeed_S" placeholder="Enter speed (m/s)"
+                 step="0.1" min="0.1" aria-label="Enter predicted minimum speed" />
+          <div class="predict-row">
+            <button class="btn" id="checkPred_S">Check Prediction</button>
+            <button class="btn secondary" id="resetS">Reset</button>
+          </div>
         </div>
+        <div id="feedbackS" class="feedback" role="alert" aria-live="polite"></div>
+      </div>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat">
+        Riya Time
+        <span class="stat-value" id="timeR_S">0.00 s</span>
+      </div>
+      <div class="stat">
+        Arjun Time
+        <span class="stat-value" id="timeA_S">0.00 s</span>
+      </div>
+      <button class="btn success" id="runS">Start Race</button>
+    </div>
+
+    <div class="chart-container">
+      <h4>Race Progress</h4>
+      <canvas id="chartS" height="200" aria-label="Chart showing race progress over time"></canvas>
+    </div>
+  </div>
+
+  <!-- Formula Puzzle Panel -->
+  <div class="card" id="panelFormula" style="display:none" role="tabpanel">
+    <h2>Formula Puzzle</h2>
+    <p>Master the relationship between Speed, Distance, and Time. Fill two values and solve for the third!</p>
+
+    <div class="formula-display">
+      <strong>Key Formulas:</strong><br>
+      Speed = Distance ÷ Time<br>
+      Distance = Speed × Time<br>
+      Time = Distance ÷ Speed
+    </div>
+
+    <div class="controls">
+      <div class="control-group">
+        <label for="hideVarF">Choose variable to solve for</label>
+        <select id="hideVarF" aria-label="Select which variable to hide">
+          <option value="speed">Solve for Speed</option>
+          <option value="distance">Solve for Distance</option>
+          <option value="time">Solve for Time</option>
+        </select>
+      </div>
+
+      <div class="control-group">
+        <label for="speedF">Speed (m/s)</label>
+        <input type="number" id="speedF" step="0.1" value="5" min="0.1"
+               aria-label="Enter speed value">
+      </div>
+
+      <div class="control-group">
+        <label for="distanceF">Distance (meters)</label>
+        <input type="number" id="distanceF" step="0.1" value="120" min="0.1"
+               aria-label="Enter distance value">
+      </div>
+
+      <div class="control-group">
+        <label for="timeF">Time (seconds)</label>
+        <input type="number" id="timeF" step="0.1" value="24" min="0.1"
+               aria-label="Enter time value">
+      </div>
+
+      <div class="control-group">
+        <label for="predictF">Your prediction for the hidden value</label>
+        <div class="predict-box">
+          <input type="number" id="predictF" placeholder="Enter your answer" step="0.001"
+                 aria-label="Enter your predicted answer" />
+          <div class="predict-row">
+            <button class="btn" id="checkF">Check Answer</button>
+            <button class="btn warning" id="revealF">Show Answer</button>
+          </div>
+        </div>
+        <div id="feedbackF" class="feedback" role="alert" aria-live="polite"></div>
       </div>
     </div>
   </div>
 
-  <!-- Side: Story + instructions + progress -->
-  <div class="side">
-    <div class="card story" id="storyCard">
-      <h3>📖 Story & Instructions</h3>
-      <div id="storyText">
-        <p><strong>Welcome!</strong> Riya and Arjun are racing. Use the controls to set speeds and distances, make predictions, then run simulations to see what happens!</p>
+  <!-- Story & Progress Sidebar -->
+  <div class="card story">
+    <h3>Story & Instructions</h3>
+    <div id="storyText">
+      <p><strong>Welcome to the Race!</strong> Riya and Arjun are ready to compete. Use the controls to set speeds and distances, make predictions, then run simulations to see what happens!</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Quick Reference</h3>
+    <div class="formula-display">
+      <strong>Remember:</strong><br>
+      • Same time → higher speed = more distance<br>
+      • Same distance → higher speed = less time<br>
+      • Speed × Time = Distance
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Progress Tracker</h3>
+    <div id="progressBox">
+      <div style="text-align:center;color:var(--text-muted);padding:20px;">
+        No attempts yet.<br>Start making predictions to track your progress!
       </div>
-    </div>
-
-    <div class="card">
-      <h3>💡 Quick Tips</h3>
-      <ul class="small">
-        <li>Speed (m/s) = Distance (m) ÷ Time (s)</li>
-        <li>Same time → higher speed = more distance</li>
-        <li>Same distance → higher speed = less time</li>
-      </ul>
-    </div>
-
-    <div class="card">
-      <h3>📊 Progress</h3>
-      <div id="progressBox" class="small">No attempts yet. Your predictions and results will appear here.</div>
     </div>
   </div>
 </div>
 
-<footer>Try: Predict → Simulate → Explain. That's how you build understanding! 🚀</footer>
-
 <script>
-  /* ------------------------
-     Helpers & state
-     ------------------------ */
-  const show = (id)=>{ document.getElementById(id).style.display = 'block' }
-  const hide = (id)=>{ document.getElementById(id).style.display = 'none' }
-  const setText=(id,txt)=>{ document.getElementById(id).textContent = txt }
-  const toFixed=(v,n=2)=> parseFloat(v).toFixed(n)
+  // Enhanced state management
+  let state = {
+    currentTab: 'Distance',
+    progressHistory: [],
+    animations: new Set(),
+    charts: {}
+  };
 
-  // Tab switching
-  document.getElementById('tabDistance').onclick = ()=>{ activateTab('Distance') }
-  document.getElementById('tabSpeed').onclick = ()=>{ activateTab('Speed') }
-  document.getElementById('tabFormula').onclick = ()=>{ activateTab('Formula') }
+  // Utility functions
+  const $ = id => document.getElementById(id);
+  const show = id => $(id).style.display = 'block';
+  const hide = id => $(id).style.display = 'none';
+  const setText = (id, txt) => $(id).textContent = txt;
+  const toFixed = (v, n = 2) => parseFloat(v).toFixed(n);
 
-  function activateTab(name){
-    // buttons
-    ['tabDistance','tabSpeed','tabFormula'].forEach(id=>document.getElementById(id).classList.remove('active'))
-    if(name==='Distance'){ document.getElementById('tabDistance').classList.add('active'); show('panelDistance'); hide('panelSpeed'); hide('panelFormula'); updateStory('Distance') }
-    if(name==='Speed'){ document.getElementById('tabSpeed').classList.add('active'); hide('panelDistance'); show('panelSpeed'); hide('panelFormula'); updateStory('Speed') }
-    if(name==='Formula'){ document.getElementById('tabFormula').classList.add('active'); hide('panelDistance'); hide('panelSpeed'); show('panelFormula'); updateStory('Formula') }
-  }
+  // Enhanced feedback system
+  function showFeedback(elementId, message, type = 'info') {
+    const el = $(elementId);
+    el.innerHTML = message;
+    el.className = `feedback ${type}`;
+    el.style.display = 'block';
 
-  function updateStory(tab){
-    const story = document.getElementById('storyText')
-    if(tab==='Distance'){
-      story.innerHTML = `<p><strong>📏 Distance Discovery</strong><br>Riya and Arjun start together. You control their speeds. Predict who covers more ground in the time window — then run the simulation!</p>`
-    } else if(tab==='Speed'){
-      story.innerHTML = `<p><strong>🏃 Speed Challenge</strong><br>They're racing the same distance. Your job: find how fast Riya needs to be to beat Arjun. Make your prediction and test it!</p>`
-    } else {
-      story.innerHTML = `<p><strong>🧮 Formula Puzzle</strong><br>Use the relationship between Speed, Distance, and Time. Fill two values and calculate the third to help solve the challenge!</p>`
+    // Add entrance animation
+    el.style.transform = 'translateY(-10px)';
+    el.style.opacity = '0';
+    setTimeout(() => {
+      el.style.transform = 'translateY(0)';
+      el.style.opacity = '1';
+    }, 50);
+
+    // Haptic feedback for mobile
+    if (window.navigator?.vibrate && type === 'success') {
+      window.navigator.vibrate(50);
     }
   }
 
-  /* ------------------------
-     Distance Mode Logic
-     ------------------------ */
-  const spdR_D_range = document.getElementById('spdR_D_range'), spdA_D_range = document.getElementById('spdA_D_range'), timeWindow_D_range = document.getElementById('timeWindow_D_range')
-  const riyaD = document.getElementById('riyaD'), arjunD = document.getElementById('arjunD'), trackD = document.getElementById('trackD')
-  let chartD = null
-
-  function updateDistanceUI(){
-    setText('spdR_D', toFixed(spdR_D_range.value,1))
-    setText('spdA_D', toFixed(spdA_D_range.value,1))
-    setText('timeWindow_D', timeWindow_D_range.value)
+  function clearFeedback(elementId) {
+    const el = $(elementId);
+    el.style.display = 'none';
+    el.className = 'feedback';
+    el.innerHTML = '';
   }
-  spdR_D_range.oninput = updateDistanceUI; spdA_D_range.oninput = updateDistanceUI; timeWindow_D_range.oninput = updateDistanceUI
-  updateDistanceUI()
 
-  // simulate for the time window; show who covered more
-  document.getElementById('runD').onclick = ()=>{
-    // compute distances
-    const vR = parseFloat(spdR_D_range.value), vA=parseFloat(spdA_D_range.value), T=parseFloat(timeWindow_D_range.value);
-    const dR = vR * T, dA = vA * T
-    setText('distR_D', toFixed(dR,2)); setText('distA_D', toFixed(dA,2))
+  // Enhanced tab system
+  function activateTab(tabName) {
+    // Update tab buttons
+    ['tabDistance', 'tabSpeed', 'tabFormula'].forEach(id => {
+      const tab = $(id);
+      const isActive = id === `tab${tabName}`;
+      tab.classList.toggle('active', isActive);
+      tab.setAttribute('aria-selected', isActive);
+    });
 
-    // animate on track proportionally to distances
-    const trackWidth = trackD.offsetWidth - riyaD.offsetWidth - 8
-    const maxD = Math.max(dR,dA,1)
-    const totalSteps = 60; let step=0
-    const startLeft = 8
-    const leftR_end = startLeft + (dR / maxD) * trackWidth
-    const leftA_end = startLeft + (dA / maxD) * trackWidth
+    // Update panels
+    const panels = ['panelDistance', 'panelSpeed', 'panelFormula'];
+    panels.forEach(id => {
+      const panel = $(id);
+      const shouldShow = id === `panel${tabName}`;
+      panel.style.display = shouldShow ? 'block' : 'none';
+    });
 
-    // chart data
-    const labels = []; const dataR=[]; const dataA=[]
-    for(let i=0;i<=totalSteps;i++){
-      labels.push((i/totalSteps * T).toFixed(2))
-      dataR.push((vR * (i/totalSteps * T)).toFixed(2))
-      dataA.push((vA * (i/totalSteps * T)).toFixed(2))
+    state.currentTab = tabName;
+    updateStory(tabName);
+
+    // Initialize charts if needed
+    if (!state.charts[tabName]) {
+      initializeChart(tabName);
     }
-    updateChartD(labels,dataR,dataA)
-
-    // animate
-    const id = setInterval(()=>{
-      step++; const pct = step/totalSteps
-      riyaD.style.left = (startLeft + (leftR_end - startLeft) * pct) + 'px'
-      arjunD.style.left = (startLeft + (leftA_end - startLeft) * pct) + 'px'
-      if(step>=totalSteps) clearInterval(id)
-    }, 35)
-
-    // give story feedback
-    let msg = `In ${T}s: Riya covered ${toFixed(dR,2)}m, Arjun covered ${toFixed(dA,2)}m. `
-    if(Math.abs(dR-dA) < 1e-6) msg += 'It\'s a tie! 🤝'
-    else msg += `${dR>dA? 'Riya' : 'Arjun'} traveled farther! ${dR>dA? '🔴' : '🔵'}`
-
-    setText('feedbackD', msg); updateProgress({mode:'distance',vR,dR,vA,dA,T, result: (dR>dA? 'Riya' : (dA>dR? 'Arjun':'Tie'))})
   }
 
-  // prediction check
-  document.getElementById('checkPred_D').onclick = ()=>{
-    const pred = document.getElementById('predictWho_D').value
-    const vR = parseFloat(spdR_D_range.value), vA=parseFloat(spdA_D_range.value), T=parseFloat(timeWindow_D_range.value)
-    const dR = vR*T, dA=vA*T
-    const actual = (Math.abs(dR-dA)<1e-6 ? 'Tie' : (dR>dA? 'Riya' : 'Arjun'))
-    const fb = document.getElementById('feedbackD')
-    if(pred===actual){
-      fb.style.color='var(--good)'; fb.style.background='rgba(31,157,85,0.1)'
-      fb.textContent = `🎉 Excellent! You predicted ${pred} and you're correct! (${toFixed(dR,2)}m vs ${toFixed(dA,2)}m)`
-    } else {
-      fb.style.color='var(--warn)'; fb.style.background='rgba(246,166,35,0.1)'
-      fb.textContent = `🤔 Close! You predicted ${pred} but actual is ${actual}. (${toFixed(dR,2)}m vs ${toFixed(dA,2)}m)`
-    }
-    updateProgress({mode:'distance_pred',predict:pred,actual:actual})
+  // Enhanced story updates
+  function updateStory(tab) {
+    const stories = {
+      Distance: `
+        <p><strong>Distance Discovery Challenge</strong></p>
+        <p>Riya and Arjun start their race together. Your mission: predict who will travel the farthest distance in the given time window. Adjust their speeds, make your prediction, then watch the simulation!</p>
+        <p><em>Tip: Remember that Distance = Speed × Time</em></p>
+      `,
+      Speed: `
+        <p><strong>Speed Challenge Race</strong></p>
+        <p>Now they're racing to cover the exact same distance. Your challenge: determine the minimum speed Riya needs to beat Arjun to the finish line. Think strategically!</p>
+        <p><em>Tip: Higher speed means less time needed for the same distance</em></p>
+      `,
+      Formula: `
+        <p><strong>Formula Mastery Puzzle</strong></p>
+        <p>Time to become a formula expert! Choose which variable to solve for, fill in the other two values, then calculate the missing piece. This builds your mathematical intuition!</p>
+        <p><em>Tip: Each formula is just a different way to express the same relationship</em></p>
+      `
+    };
+
+    $('storyText').innerHTML = stories[tab] || stories.Distance;
   }
 
-  document.getElementById('resetD').onclick = ()=>{
-    riyaD.style.left='8px'; arjunD.style.left='8px'; setText('distR_D','0'); setText('distA_D','0');
-    const fb = document.getElementById('feedbackD')
-    fb.textContent=''; fb.style.background=''; fb.style.color=''
-    if(chartD) { chartD.data.labels=[]; chartD.data.datasets[0].data=[]; chartD.data.datasets[1].data=[]; chartD.update(); }
-  }
+  // Enhanced animation system
+  function animateRunners(trackId, runners, distances, duration = 2000) {
+    const track = $(trackId);
+    const trackWidth = track.offsetWidth - 70; // Account for runner width and padding
+    const maxDistance = Math.max(...distances, 1);
 
-  function initChartD(){
-    const ctx = document.getElementById('chartD').getContext('2d')
-    chartD = new Chart(ctx,{type:'line',data:{labels:[],datasets:[
-      {label:'Riya distance (m)',data:[],borderColor:'#ff7b7b',backgroundColor:'rgba(255,123,123,0.1)',fill:false,tension:0.1},
-      {label:'Arjun distance (m)',data:[],borderColor:'#4f8cff',backgroundColor:'rgba(79,140,255,0.1)',fill:false,tension:0.1}
-    ]}, options:{
-      responsive:true,
-      plugins:{legend:{position:'top',labels:{usePointStyle:true}}},
-      scales:{y:{beginAtZero:true,title:{display:true,text:'Distance (m)'}},x:{title:{display:true,text:'Time (s)'}}},
-      elements:{point:{radius:2}}
-    }})
-  }
-  function updateChartD(labels,dR,dA){ if(chartD){ chartD.data.labels = labels; chartD.data.datasets[0].data = dR; chartD.data.datasets[1].data = dA; chartD.update(); } }
+    // Clear any existing animations
+    state.animations.forEach(id => clearInterval(id));
+    state.animations.clear();
 
-  /* ------------------------
-     Speed Mode Logic
-     ------------------------ */
-  const raceDist_S_range = document.getElementById('raceDist_S_range'), spdR_S_range = document.getElementById('spdR_S_range'), spdA_S_range = document.getElementById('spdA_S_range')
-  const riyaS = document.getElementById('riyaS'), arjunS = document.getElementById('arjunS'), trackS = document.getElementById('trackS')
-  let chartS = null
+    const steps = 60;
+    const stepDuration = duration / steps;
+    let currentStep = 0;
 
-  function updateSpeedUI(){
-    setText('raceDist_S', raceDist_S_range.value)
-    setText('spdR_S', toFixed(spdR_S_range.value,1))
-    setText('spdA_S', toFixed(spdA_S_range.value,1))
-  }
-  raceDist_S_range.oninput = updateSpeedUI; spdR_S_range.oninput = updateSpeedUI; spdA_S_range.oninput = updateSpeedUI
-  updateSpeedUI()
+    const animationId = setInterval(() => {
+      const progress = currentStep / steps;
 
-  document.getElementById('runS').onclick = ()=>{
-    const D = parseFloat(raceDist_S_range.value), vR = parseFloat(spdR_S_range.value), vA = parseFloat(spdA_S_range.value)
-    // times
-    const tR = vR>0 ? D / vR : Infinity, tA = vA>0 ? D / vA : Infinity
-    setText('timeR_S', toFixed(tR,2)); setText('timeA_S', toFixed(tA,2))
+      runners.forEach((runner, index) => {
+        const targetDistance = distances[index];
+        const currentDistance = targetDistance * progress;
+        const pixelPosition = 20 + (currentDistance / maxDistance) * trackWidth;
 
-    // animate: we map distance -> track width
-    const trackWidth = trackS.offsetWidth - riyaS.offsetWidth - 8
-    const totalSteps = 80, startLeft=8
-    let step=0
-    const leftR_end = startLeft + trackWidth
-    const leftA_end = startLeft + trackWidth
+        $(runner).style.left = `${Math.min(pixelPosition, trackWidth + 20)}px`;
+        $(runner).style.transform = `scale(${1 + Math.sin(progress * Math.PI * 4) * 0.1})`;
+      });
 
-    // Animation based on relative speeds
-    const id = setInterval(()=>{
-      step++
-      const timeElapsed = step / totalSteps * Math.max(tR, tA)
+      currentStep++;
+      if (currentStep > steps) {
+        clearInterval(animationId);
+        state.animations.delete(animationId);
 
-      // Calculate positions based on distance covered
-      const distR = Math.min(D, vR * timeElapsed)
-      const distA = Math.min(D, vA * timeElapsed)
-
-      const pctR = distR / D
-      const pctA = distA / D
-
-      riyaS.style.left = (startLeft + pctR * trackWidth) + 'px'
-      arjunS.style.left = (startLeft + pctA * trackWidth) + 'px'
-
-      if(step>=totalSteps) clearInterval(id)
-    }, 40)
-
-    // Chart: distance vs time
-    const labels=[]; const rDist=[]; const aDist=[]
-    const steps=50
-    const maxTime = Math.max(tR, tA)
-    for(let i=0;i<=steps;i++){
-      const tt = (i/steps) * maxTime
-      labels.push(toFixed(tt,1))
-      rDist.push(toFixed(Math.min(D, vR*tt),1))
-      aDist.push(toFixed(Math.min(D, vA*tt),1))
-    }
-    updateChartS(labels,rDist,aDist)
-
-    // result
-    let winner = (Math.abs(tR - tA) < 1e-6) ? 'Tie' : (tR < tA ? 'Riya' : 'Arjun')
-    let msg = `Race results: Riya ${toFixed(tR,2)}s, Arjun ${toFixed(tA,2)}s. `
-    if(winner === 'Tie') msg += 'It\'s a tie! 🤝'
-    else msg += `Winner: ${winner}! ${winner==='Riya'? '🔴' : '🔵'}`
-
-    const fb = document.getElementById('feedbackS')
-    fb.textContent = msg
-    fb.style.background = 'rgba(11,116,218,0.1)'
-    fb.style.color = 'var(--accent)'
-
-    updateProgress({mode:'speed',D,vR,vA,tR,tA,winner})
-  }
-
-  // prediction check: student predicts minimum speed Riya needs to beat Arjun
-  document.getElementById('checkPred_S').onclick = ()=>{
-    const D = parseFloat(raceDist_S_range.value), vA = parseFloat(spdA_S_range.value)
-    const student = parseFloat(document.getElementById('predictSpeed_S').value)
-    const fb = document.getElementById('feedbackS')
-
-    if(isNaN(student)){
-      fb.style.color='var(--muted)'; fb.style.background='rgba(0,0,0,0.05)'
-      fb.textContent = 'Please enter a number to check your prediction! 📝';
-      return;
-    }
-
-    if(student > vA){
-      fb.style.color='var(--good)'; fb.style.background='rgba(31,157,85,0.1)'
-      fb.textContent = `🎉 Correct! ${student} m/s > ${vA} m/s — Riya will win!`
-    } else if(Math.abs(student - vA) < 1e-6){
-      fb.style.color='var(--warn)'; fb.style.background='rgba(246,166,35,0.1)'
-      fb.textContent = `⚖️ At ${student} m/s = ${vA} m/s, it would be a tie!`
-    } else {
-      fb.style.color='var(--bad)'; fb.style.background='rgba(214,69,69,0.1)'
-      fb.textContent = `❌ ${student} m/s is not enough — Arjun at ${vA} m/s would be faster!`
-    }
-    updateProgress({mode:'speed_pred',student,requiredCompare: vA})
-  }
-
-  document.getElementById('resetS').onclick = ()=>{
-    riyaS.style.left='8px'; arjunS.style.left='8px'; setText('timeR_S','0'); setText('timeA_S','0');
-    const fb = document.getElementById('feedbackS')
-    fb.textContent=''; fb.style.background=''; fb.style.color=''
-    if(chartS) { chartS.data.labels=[]; chartS.data.datasets[0].data=[]; chartS.data.datasets[1].data=[]; chartS.update(); }
-  }
-
-  function initChartS(){
-    const ctx = document.getElementById('chartS').getContext('2d')
-    chartS = new Chart(ctx,{type:'line',data:{labels:[],datasets:[
-      {label:'Riya distance (m)',data:[],borderColor:'#ff7b7b',backgroundColor:'rgba(255,123,123,0.1)',fill:false,tension:0.1},
-      {label:'Arjun distance (m)',data:[],borderColor:'#4f8cff',backgroundColor:'rgba(79,140,255,0.1)',fill:false,tension:0.1}
-    ]}, options:{
-      responsive:true,
-      plugins:{legend:{position:'top',labels:{usePointStyle:true}}},
-      scales:{y:{beginAtZero:true,title:{display:true,text:'Distance (m)'}},x:{title:{display:true,text:'Time (s)'}}},
-      elements:{point:{radius:2}}
-    }})
-  }
-  function updateChartS(labels,dR,dA){ if(chartS){ chartS.data.labels = labels; chartS.data.datasets[0].data = dR; chartS.data.datasets[1].data = dA; chartS.update(); } }
-
-  /* ------------------------
-     Formula Puzzle Logic
-     ------------------------ */
-  const hideVarF = document.getElementById('hideVarF'), speedF = document.getElementById('speedF'), distanceF = document.getElementById('distanceF'), timeF = document.getElementById('timeF'), predictF = document.getElementById('predictF')
-
-  function adjustHiddenInputs(){
-    const hv = hideVarF.value
-    speedF.disabled = (hv==='speed'); distanceF.disabled = (hv==='distance'); timeF.disabled = (hv==='time')
-    speedF.style.opacity = speedF.disabled ? '0.5' : '1'
-    distanceF.style.opacity = distanceF.disabled ? '0.5' : '1'
-    timeF.style.opacity = timeF.disabled ? '0.5' : '1'
-
-    const fb = document.getElementById('feedbackF')
-    fb.textContent=''; fb.style.background=''; fb.style.color=''
-  }
-  hideVarF.onchange = adjustHiddenInputs
-  adjustHiddenInputs()
-
-  function computeHidden(){
-    const hv = hideVarF.value
-    const s = parseFloat(speedF.value), d = parseFloat(distanceF.value), t = parseFloat(timeF.value)
-    if(hv==='speed') return d / t
-    if(hv==='distance') return s * t
-    return d / s
-  }
-
-  document.getElementById('checkF').onclick = ()=>{
-    const actual = computeHidden()
-    const guess = parseFloat(predictF.value)
-    const fb = document.getElementById('feedbackF')
-
-    if(isNaN(guess)){
-      fb.style.color='var(--muted)'; fb.style.background='rgba(0,0,0,0.05)'
-      fb.textContent = 'Please enter your prediction! 📝';
-      return;
-    }
-
-    const diff = Math.abs(guess - actual)
-    const tolerance = Math.max(0.05, 0.05*Math.abs(actual))
-
-    if(diff <= tolerance){
-      fb.style.color='var(--good)'; fb.style.background='rgba(31,157,85,0.1)'
-      fb.textContent = `🎉 Excellent! Your guess ${guess} is very close to ${toFixed(actual,3)}!`
-    } else {
-      fb.style.color='var(--warn)'; fb.style.background='rgba(246,166,35,0.1)'
-      fb.textContent = `🤔 Not quite! Your guess: ${guess}, actual: ${toFixed(actual,3)}. ${explainHidden(hideVarF.value)}`
-    }
-    updateProgress({mode:'formula_pred',hidden:hideVarF.value,actual:toFixed(actual,3),guess})
-  }
-
-  document.getElementById('revealF').onclick = ()=>{
-    const actual = computeHidden()
-    const fb = document.getElementById('feedbackF')
-    fb.textContent = `💡 Answer: ${toFixed(actual,3)}. ${explainHidden(hideVarF.value)}`
-    fb.style.color = 'var(--accent)'
-    fb.style.background = 'rgba(11,116,218,0.1)'
-    updateProgress({mode:'formula_reveal',hidden:hideVarF.value,actual:toFixed(actual,3)})
-  }
-
-  function explainHidden(which){
-    if(which==='speed') return 'Speed = Distance ÷ Time. Higher speed covers same distance faster! 🏃‍♀️'
-    if(which==='distance') return 'Distance = Speed × Time. More speed or time = more distance! 📏'
-    return 'Time = Distance ÷ Speed. Higher speed means less time needed! ⏱️'
-  }
-
-  /* ------------------------
-     Progress logging (using variables instead of localStorage for WebView compatibility)
-     ------------------------ */
-  let progressHistory = []
-
-  function updateProgress(obj){
-    progressHistory.push({...obj, ts:new Date().toISOString()})
-    // Keep only last 20 entries
-    if(progressHistory.length > 20) {
-      progressHistory = progressHistory.slice(-20)
-    }
-    renderProgress()
-  }
-
-  function renderProgress(){
-    const box = document.getElementById('progressBox')
-    if(progressHistory.length===0){
-      box.innerHTML = '<div style="text-align:center;color:var(--muted);padding:20px;">🎯 No attempts yet.<br>Start making predictions!</div>'
-      return
-    }
-
-    const last = progressHistory.slice(-5).reverse()
-    box.innerHTML = last.map((it, index) => {
-      const time = it.ts.split('T')[1].split('.')[0].slice(0,5)
-      const mode = it.mode.replace('_', ' ')
-      return `<div class="progress-item">
-        <div style="font-weight:600;color:var(--accent);margin-bottom:2px;">${mode}</div>
-        <div style="font-size:11px;color:var(--muted);">${time} • ${getProgressSummary(it)}</div>
-      </div>`
-    }).join('')
-  }
-
-  function getProgressSummary(item) {
-    if(item.mode === 'distance_pred') return `Predicted: ${item.predict}, Actual: ${item.actual}`
-    if(item.mode === 'speed_pred') return `Guessed: ${item.student} m/s vs ${item.requiredCompare} m/s`
-    if(item.mode === 'formula_pred') return `${item.hidden}: guessed ${item.guess}, actual ${item.actual}`
-    if(item.mode === 'distance') return `Result: ${item.result} (${item.dR}m vs ${item.dA}m)`
-    if(item.mode === 'speed') return `Winner: ${item.winner} (${item.tR}s vs ${item.tA}s)`
-    return 'Completed'
-  }
-
-  /* ------------------------
-     Init everything
-     ------------------------ */
-  window.addEventListener('load', ()=>{
-    activateTab('Distance')
-    initChartD(); initChartS(); renderProgress()
-  })
-
-  // Better mobile UX: Enter key triggers check buttons
-  document.getElementById('predictSpeed_S').addEventListener('keydown', e=>{
-    if(e.key==='Enter') {
-      e.preventDefault()
-      document.getElementById('checkPred_S').click()
-    }
-  })
-
-  predictF.addEventListener('keydown', e=>{
-    if(e.key==='Enter') {
-      e.preventDefault()
-      document.getElementById('checkF').click()
-    }
-  })
-
-  // Prevent zoom on input focus (iOS Safari)
-  const inputs = document.querySelectorAll('input[type="number"]')
-  inputs.forEach(input => {
-    input.addEventListener('focus', () => {
-      input.style.fontSize = '16px'
-    })
-  })
-
-  // Add haptic feedback simulation for buttons (if running in app)
-  const buttons = document.querySelectorAll('.btn')
-  buttons.forEach(btn => {
-    btn.addEventListener('touchstart', () => {
-      if (window.navigator && window.navigator.vibrate) {
-        window.navigator.vibrate(10)
+        // Reset transform after animation
+        runners.forEach(runner => {
+          $(runner).style.transform = 'scale(1)';
+        });
       }
-    })
-  })
+    }, stepDuration);
+
+    state.animations.add(animationId);
+  }
+
+  // Enhanced chart initialization
+  function initializeChart(mode) {
+    const canvasId = `chart${mode.charAt(0)}`;
+    const canvas = $(canvasId);
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+
+    const config = {
+      type: 'line',
+      data: {
+        labels: [],
+        datasets: [
+          {
+            label: 'Riya',
+            data: [],
+            borderColor: '#ef4444',
+            backgroundColor: 'rgba(239, 68, 68, 0.1)',
+            borderWidth: 3,
+            fill: false,
+            tension: 0.4,
+            pointBackgroundColor: '#ef4444',
+            pointBorderColor: '#ffffff',
+            pointBorderWidth: 2,
+            pointRadius: 4
+          },
+          {
+            label: 'Arjun',
+            data: [],
+            borderColor: '#3b82f6',
+            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+            borderWidth: 3,
+            fill: false,
+            tension: 0.4,
+            pointBackgroundColor: '#3b82f6',
+            pointBorderColor: '#ffffff',
+            pointBorderWidth: 2,
+            pointRadius: 4
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        interaction: {
+          intersect: false,
+          mode: 'index'
+        },
+        plugins: {
+          legend: {
+            position: 'top',
+            labels: {
+              usePointStyle: true,
+              padding: 20,
+              font: {
+                size: 14,
+                weight: '600'
+              }
+            }
+          },
+          tooltip: {
+            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+            titleColor: '#ffffff',
+            bodyColor: '#ffffff',
+            borderColor: '#6366f1',
+            borderWidth: 1,
+            cornerRadius: 8,
+            displayColors: true
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            title: {
+              display: true,
+              text: mode === 'Distance' ? 'Distance (m)' : 'Distance (m)',
+              font: { size: 14, weight: '600' }
+            },
+            grid: {
+              color: 'rgba(0, 0, 0, 0.1)'
+            }
+          },
+          x: {
+            title: {
+              display: true,
+              text: 'Time (s)',
+              font: { size: 14, weight: '600' }
+            },
+            grid: {
+              color: 'rgba(0, 0, 0, 0.1)'
+            }
+          }
+        },
+        elements: {
+          point: {
+            hoverRadius: 6
+          }
+        }
+      }
+    };
+
+    state.charts[mode] = new Chart(ctx, config);
+  }
+
+  // Enhanced chart updates
+  function updateChart(mode, labels, riyaData, arjunData) {
+    const chart = state.charts[mode];
+    if (!chart) return;
+
+    chart.data.labels = labels;
+    chart.data.datasets[0].data = riyaData;
+    chart.data.datasets[1].data = arjunData;
+    chart.update('active');
+  }
+
+  // Distance Mode Logic
+  function initDistanceMode() {
+    const elements = {
+      spdR: $('spdR_D_range'),
+      spdA: $('spdA_D_range'),
+      timeWindow: $('timeWindow_D_range')
+    };
+
+    function updateUI() {
+      setText('spdR_D', toFixed(elements.spdR.value, 1));
+      setText('spdA_D', toFixed(elements.spdA.value, 1));
+      setText('timeWindow_D', elements.timeWindow.value);
+    }
+
+    Object.values(elements).forEach(el => el.oninput = updateUI);
+    updateUI();
+
+    $('runD').onclick = () => runDistanceSimulation(elements);
+    $('checkPred_D').onclick = () => checkDistancePrediction(elements);
+    $('resetD').onclick = () => resetDistanceMode();
+  }
+
+  function runDistanceSimulation(elements) {
+    const vR = parseFloat(elements.spdR.value);
+    const vA = parseFloat(elements.spdA.value);
+    const T = parseFloat(elements.timeWindow.value);
+
+    const dR = vR * T;
+    const dA = vA * T;
+
+    setText('distR_D', toFixed(dR, 2) + ' m');
+    setText('distA_D', toFixed(dA, 2) + ' m');
+
+    // Animate runners
+    animateRunners('trackD', ['riyaD', 'arjunD'], [dR, dA]);
+
+    // Generate chart data
+    const labels = [];
+    const riyaData = [];
+    const arjunData = [];
+
+    for (let i = 0; i <= 50; i++) {
+      const t = (i / 50) * T;
+      labels.push(toFixed(t, 1));
+      riyaData.push(toFixed(vR * t, 2));
+      arjunData.push(toFixed(vA * t, 2));
+    }
+
+    updateChart('Distance', labels, riyaData, arjunData);
+
+    // Show results
+    const winner = Math.abs(dR - dA) < 0.01 ? 'Tie' : (dR > dA ? 'Riya' : 'Arjun');
+    const message = `
+      <strong>Simulation Complete!</strong><br>
+      In ${T}s: Riya covered ${toFixed(dR, 2)}m, Arjun covered ${toFixed(dA, 2)}m.<br>
+      ${winner === 'Tie' ? 'It\'s a perfect tie!' : `${winner} traveled farther!`}
+    `;
+
+    showFeedback('feedbackD', message, 'success');
+    updateProgress({
+      mode: 'distance_simulation',
+      riyaSpeed: vR, arjunSpeed: vA, time: T,
+      riyaDistance: dR, arjunDistance: dA, winner
+    });
+  }
+
+  function checkDistancePrediction(elements) {
+    const prediction = $('predictWho_D').value;
+    const vR = parseFloat(elements.spdR.value);
+    const vA = parseFloat(elements.spdA.value);
+    const T = parseFloat(elements.timeWindow.value);
+
+    const dR = vR * T;
+    const dA = vA * T;
+    const actual = Math.abs(dR - dA) < 0.01 ? 'Tie' : (dR > dA ? 'Riya' : 'Arjun');
+
+    const isCorrect = prediction === actual;
+    const message = isCorrect
+      ? `<strong>Excellent prediction!</strong><br>You correctly predicted ${prediction}!<br>Riya: ${toFixed(dR, 2)}m, Arjun: ${toFixed(dA, 2)}m`
+      : `<strong>Close, but not quite!</strong><br>You predicted ${prediction}, but ${actual} actually travels farther.<br>Riya: ${toFixed(dR, 2)}m, Arjun: ${toFixed(dA, 2)}m`;
+
+    showFeedback('feedbackD', message, isCorrect ? 'success' : 'warning');
+    updateProgress({
+      mode: 'distance_prediction',
+      prediction, actual, correct: isCorrect,
+      riyaDistance: dR, arjunDistance: dA
+    });
+  }
+
+  function resetDistanceMode() {
+    ['riyaD', 'arjunD'].forEach(id => $(id).style.left = '20px');
+    setText('distR_D', '0.00 m');
+    setText('distA_D', '0.00 m');
+    clearFeedback('feedbackD');
+
+    if (state.charts.Distance) {
+      state.charts.Distance.data.labels = [];
+      state.charts.Distance.data.datasets[0].data = [];
+      state.charts.Distance.data.datasets[1].data = [];
+      state.charts.Distance.update();
+    }
+  }
+
+  // Speed Mode Logic
+  function initSpeedMode() {
+    const elements = {
+      raceDist: $('raceDist_S_range'),
+      spdR: $('spdR_S_range'),
+      spdA: $('spdA_S_range')
+    };
+
+    function updateUI() {
+      setText('raceDist_S', elements.raceDist.value);
+      setText('spdR_S', toFixed(elements.spdR.value, 1));
+      setText('spdA_S', toFixed(elements.spdA.value, 1));
+    }
+
+    Object.values(elements).forEach(el => el.oninput = updateUI);
+    updateUI();
+
+    $('runS').onclick = () => runSpeedSimulation(elements);
+    $('checkPred_S').onclick = () => checkSpeedPrediction(elements);
+    $('resetS').onclick = () => resetSpeedMode();
+  }
+
+  function runSpeedSimulation(elements) {
+    const D = parseFloat(elements.raceDist.value);
+    const vR = parseFloat(elements.spdR.value);
+    const vA = parseFloat(elements.spdA.value);
+
+    const tR = vR > 0 ? D / vR : Infinity;
+    const tA = vA > 0 ? D / vA : Infinity;
+
+    setText('timeR_S', toFixed(tR, 2) + ' s');
+    setText('timeA_S', toFixed(tA, 2) + ' s');
+
+    // Animate race
+    const maxTime = Math.max(tR, tA);
+    const duration = Math.min(3000, maxTime * 200); // Scale animation duration
+
+    animateRunners('trackS', ['riyaS', 'arjunS'], [D, D], duration);
+
+    // Generate chart data
+    const labels = [];
+    const riyaData = [];
+    const arjunData = [];
+
+    for (let i = 0; i <= 50; i++) {
+      const t = (i / 50) * maxTime;
+      labels.push(toFixed(t, 1));
+      riyaData.push(toFixed(Math.min(D, vR * t), 2));
+      arjunData.push(toFixed(Math.min(D, vA * t), 2));
+    }
+
+    updateChart('Speed', labels, riyaData, arjunData);
+
+    // Show results
+    const winner = Math.abs(tR - tA) < 0.01 ? 'Tie' : (tR < tA ? 'Riya' : 'Arjun');
+    const message = `
+      <strong>Race Complete!</strong><br>
+      Riya finished in ${toFixed(tR, 2)}s, Arjun in ${toFixed(tA, 2)}s.<br>
+      ${winner === 'Tie' ? 'Perfect tie!' : `${winner} wins the race!`}
+    `;
+
+    showFeedback('feedbackS', message, 'success');
+    updateProgress({
+      mode: 'speed_simulation',
+      distance: D, riyaSpeed: vR, arjunSpeed: vA,
+      riyaTime: tR, arjunTime: tA, winner
+    });
+  }
+
+  function checkSpeedPrediction(elements) {
+    const prediction = parseFloat($('predictSpeed_S').value);
+    const vA = parseFloat(elements.spdA.value);
+
+    if (isNaN(prediction)) {
+      showFeedback('feedbackS', 'Please enter a speed value to check your prediction!', 'warning');
+      return;
+    }
+
+    const tolerance = 0.1;
+    const minSpeedNeeded = vA + tolerance;
+    const isCorrect = prediction > vA;
+    const isClose = Math.abs(prediction - vA) < tolerance;
+
+    let message, type;
+    if (isCorrect && !isClose) {
+      message = `<strong>Correct!</strong><br>${toFixed(prediction, 1)} m/s > ${toFixed(vA, 1)} m/s<br>Riya will win the race!`;
+      type = 'success';
+    } else if (isClose) {
+      message = `<strong>Very close!</strong><br>At ${toFixed(prediction, 1)} m/s ≈ ${toFixed(vA, 1)} m/s, it would be nearly a tie!`;
+      type = 'warning';
+    } else {
+      message = `<strong>Not quite right.</strong><br>${toFixed(prediction, 1)} m/s < ${toFixed(vA, 1)} m/s<br>Riya needs to be faster than Arjun to win.`;
+      type = 'error';
+    }
+
+    showFeedback('feedbackS', message, type);
+    updateProgress({
+      mode: 'speed_prediction',
+      prediction, arjunSpeed: vA, correct: isCorrect
+    });
+  }
+
+  function resetSpeedMode() {
+    ['riyaS', 'arjunS'].forEach(id => $(id).style.left = '20px');
+    setText('timeR_S', '0.00 s');
+    setText('timeA_S', '0.00 s');
+    clearFeedback('feedbackS');
+
+    if (state.charts.Speed) {
+      state.charts.Speed.data.labels = [];
+      state.charts.Speed.data.datasets[0].data = [];
+      state.charts.Speed.data.datasets[1].data = [];
+      state.charts.Speed.update();
+    }
+  }
+
+  // Formula Mode Logic
+  function initFormulaMode() {
+    const elements = {
+      hideVar: $('hideVarF'),
+      speed: $('speedF'),
+      distance: $('distanceF'),
+      time: $('timeF'),
+      predict: $('predictF')
+    };
+
+    function updateHiddenInputs() {
+      const hidden = elements.hideVar.value;
+
+      elements.speed.disabled = hidden === 'speed';
+      elements.distance.disabled = hidden === 'distance';
+      elements.time.disabled = hidden === 'time';
+
+      // Visual feedback for disabled inputs
+      [elements.speed, elements.distance, elements.time].forEach(input => {
+        input.style.opacity = input.disabled ? '0.5' : '1';
+        input.style.pointerEvents = input.disabled ? 'none' : 'auto';
+      });
+
+      clearFeedback('feedbackF');
+      elements.predict.value = '';
+    }
+
+    elements.hideVar.onchange = updateHiddenInputs;
+    updateHiddenInputs();
+
+    $('checkF').onclick = () => checkFormulaPrediction(elements);
+    $('revealF').onclick = () => revealFormulaAnswer(elements);
+  }
+
+  function computeHiddenValue(elements) {
+    const hidden = elements.hideVar.value;
+    const s = parseFloat(elements.speed.value);
+    const d = parseFloat(elements.distance.value);
+    const t = parseFloat(elements.time.value);
+
+    switch (hidden) {
+      case 'speed': return d / t;
+      case 'distance': return s * t;
+      case 'time': return d / s;
+      default: return 0;
+    }
+  }
+
+  function checkFormulaPrediction(elements) {
+    const prediction = parseFloat(elements.predict.value);
+    const actual = computeHiddenValue(elements);
+    const hidden = elements.hideVar.value;
+
+    if (isNaN(prediction)) {
+      showFeedback('feedbackF', 'Please enter your prediction first!', 'warning');
+      return;
+    }
+
+    const tolerance = Math.max(0.01, Math.abs(actual) * 0.05); // 5% tolerance or 0.01 minimum
+    const difference = Math.abs(prediction - actual);
+    const isCorrect = difference <= tolerance;
+
+    let message, type;
+    if (isCorrect) {
+      message = `<strong>Excellent!</strong><br>Your answer ${toFixed(prediction, 3)} is ${hidden === 'speed' ? 'm/s' : hidden === 'distance' ? 'm' : 's'} is correct!<br>Actual: ${toFixed(actual, 3)}`;
+      type = 'success';
+    } else {
+      message = `<strong>Close attempt!</strong><br>Your answer: ${toFixed(prediction, 3)}<br>Correct answer: ${toFixed(actual, 3)}<br>${getFormulaExplanation(hidden)}`;
+      type = 'warning';
+    }
+
+    showFeedback('feedbackF', message, type);
+    updateProgress({
+      mode: 'formula_check',
+      hidden, prediction, actual, correct: isCorrect
+    });
+  }
+
+  function revealFormulaAnswer(elements) {
+    const actual = computeHiddenValue(elements);
+    const hidden = elements.hideVar.value;
+    const unit = hidden === 'speed' ? 'm/s' : hidden === 'distance' ? 'm' : 's';
+
+    const message = `<strong>Answer Revealed:</strong><br>${toFixed(actual, 3)} ${unit}<br>${getFormulaExplanation(hidden)}`;
+    showFeedback('feedbackF', message, 'info');
+
+    updateProgress({
+      mode: 'formula_reveal',
+      hidden, actual
+    });
+  }
+
+  function getFormulaExplanation(variable) {
+    const explanations = {
+      speed: 'Speed = Distance ÷ Time<br>Higher speed covers the same distance in less time.',
+      distance: 'Distance = Speed × Time<br>More speed or more time means greater distance.',
+      time: 'Time = Distance ÷ Speed<br>Higher speed reduces the time needed.'
+    };
+    return explanations[variable] || '';
+  }
+
+  // Progress tracking system
+  function updateProgress(entry) {
+    state.progressHistory.push({
+      ...entry,
+      timestamp: new Date().toISOString(),
+      tabMode: state.currentTab
+    });
+
+    // Keep only recent entries
+    if (state.progressHistory.length > 50) {
+      state.progressHistory = state.progressHistory.slice(-50);
+    }
+
+    renderProgress();
+  }
+
+  function renderProgress() {
+    const container = $('progressBox');
+    const recent = state.progressHistory.slice(-10).reverse();
+
+    if (recent.length === 0) {
+      container.innerHTML = `
+        <div style="text-align:center;color:var(--text-muted);padding:20px;">
+          No attempts yet.<br>Start making predictions to track your progress!
+        </div>
+      `;
+      return;
+    }
+
+    const html = recent.map((entry, index) => {
+      const time = new Date(entry.timestamp).toLocaleTimeString('en-US', {
+        hour12: false,
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+
+      return `
+        <div class="progress-item">
+          <div style="font-weight:700;color:var(--primary);margin-bottom:4px;">
+            ${entry.tabMode} - ${entry.mode.replace('_', ' ')}
+          </div>
+          <div style="font-size:12px;color:var(--text-muted);">
+            ${time} • ${getProgressSummary(entry)}
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    container.innerHTML = html;
+  }
+
+  function getProgressSummary(entry) {
+    switch (entry.mode) {
+      case 'distance_prediction':
+        return `Predicted: ${entry.prediction}, Actual: ${entry.actual} ${entry.correct ? '✓' : '✗'}`;
+      case 'distance_simulation':
+        return `Winner: ${entry.winner} (${entry.riyaDistance.toFixed(1)}m vs ${entry.arjunDistance.toFixed(1)}m)`;
+      case 'speed_prediction':
+        return `Predicted: ${entry.prediction} m/s vs required: >${entry.arjunSpeed} m/s ${entry.correct ? '✓' : '✗'}`;
+      case 'speed_simulation':
+        return `Winner: ${entry.winner} (${entry.riyaTime.toFixed(2)}s vs ${entry.arjunTime.toFixed(2)}s)`;
+      case 'formula_check':
+        return `${entry.hidden}: ${entry.prediction} vs ${entry.actual.toFixed(3)} ${entry.correct ? '✓' : '✗'}`;
+      case 'formula_reveal':
+        return `${entry.hidden}: ${entry.actual.toFixed(3)} (revealed)`;
+      default:
+        return 'Completed';
+    }
+  }
+
+  // Event listeners and initialization
+  function initializeEventListeners() {
+    // Tab navigation
+    $('tabDistance').onclick = () => activateTab('Distance');
+    $('tabSpeed').onclick = () => activateTab('Speed');
+    $('tabFormula').onclick = () => activateTab('Formula');
+
+    // Keyboard shortcuts
+    document.addEventListener('keydown', (e) => {
+      if (e.altKey) {
+        switch (e.key) {
+          case '1':
+            e.preventDefault();
+            activateTab('Distance');
+            break;
+          case '2':
+            e.preventDefault();
+            activateTab('Speed');
+            break;
+          case '3':
+            e.preventDefault();
+            activateTab('Formula');
+            break;
+        }
+      }
+
+      // Enter key support for inputs
+      if (e.key === 'Enter') {
+        const focused = document.activeElement;
+        if (focused.id === 'predictSpeed_S') {
+          $('checkPred_S').click();
+        } else if (focused.id === 'predictF') {
+          $('checkF').click();
+        }
+      }
+    });
+
+    // Prevent zoom on input focus (iOS fix)
+    const inputs = document.querySelectorAll('input[type="number"]');
+    inputs.forEach(input => {
+      input.addEventListener('focus', () => {
+        input.style.fontSize = '16px';
+      });
+    });
+
+    // Touch feedback
+    const buttons = document.querySelectorAll('.btn, .tab-btn');
+    buttons.forEach(btn => {
+      btn.addEventListener('touchstart', () => {
+        if (window.navigator?.vibrate) {
+          window.navigator.vibrate(10);
+        }
+      }, { passive: true });
+    });
+  }
+
+  // Application initialization
+  function initializeApp() {
+    // Set up all modes
+    initDistanceMode();
+    initSpeedMode();
+    initFormulaMode();
+
+    // Set up event listeners
+    initializeEventListeners();
+
+    // Start with distance mode
+    activateTab('Distance');
+
+    // Initialize progress display
+    renderProgress();
+
+    // Add loading states
+    document.querySelectorAll('.btn').forEach(btn => {
+      btn.addEventListener('click', function() {
+        this.classList.add('loading');
+        setTimeout(() => {
+          this.classList.remove('loading');
+        }, 1000);
+      });
+    });
+  }
+
+  // Start the application when DOM is ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initializeApp);
+  } else {
+    initializeApp();
+  }
+
+  // Handle orientation changes and window resize
+  window.addEventListener('orientationchange', () => {
+    setTimeout(() => {
+      Object.values(state.charts).forEach(chart => {
+        if (chart) chart.resize();
+      });
+    }, 100);
+  });
+
+  window.addEventListener('resize', () => {
+    Object.values(state.charts).forEach(chart => {
+      if (chart) chart.resize();
+    });
+  });
 
 </script>
 </body>

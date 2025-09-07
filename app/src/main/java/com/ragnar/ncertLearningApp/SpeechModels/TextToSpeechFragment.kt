@@ -33,7 +33,7 @@ class TextToSpeechFragment : Fragment(), TextToSpeech.OnInitListener {
 
     private lateinit var textToSpeech: TextToSpeech
     private lateinit var editText: EditText
-    private lateinit var speakButton: Button
+    private lateinit var speakButton: TextView
     private lateinit var languageSpinner: Spinner
     private lateinit var voiceSpinner: Spinner
     private lateinit var speedSeekBar: SeekBar

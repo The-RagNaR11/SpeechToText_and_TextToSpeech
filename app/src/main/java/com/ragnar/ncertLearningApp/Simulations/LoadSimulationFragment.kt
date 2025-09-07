@@ -4,92 +4,69 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.webkit.WebView
-import android.widget.AdapterView
-import android.widget.ArrayAdapter
-import android.widget.Spinner
+import androidx.cardview.widget.CardView
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.ragnar.ncertLearningApp.R
 
 /*
-this fragment class used to set up a spinner that
-contains list of all simulations
-
-loads the RaceStory simulation by default and changes the simulation on the
-basis of selected item on sinner i.e. dropdown menu
+this fragment class used to set up a RecyclerView that
+contains list of all simulations.
  */
 class LoadSimulationFragment : Fragment() {
 
-    private lateinit var webView: WebView
-    private lateinit var spinner: Spinner
+    private lateinit var simulationsRecyclerView: RecyclerView
+    private lateinit var parentBottomNavBar: CardView
+    private lateinit var parentTitleBar: CardView
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_race_story_simulation, container, false)
+        return inflater.inflate(R.layout.fragment_load_simulation, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        webView = view.findViewById(R.id.webView)
-        spinner = view.findViewById<Spinner>(R.id.simulationSpinner)
+        // load parent components
+        parentTitleBar = requireActivity().findViewById<CardView>(R.id.titleCardView)
+        parentBottomNavBar = requireActivity().findViewById<CardView>(R.id.navBarCardView)
 
 
-        webView.settings.javaScriptEnabled = true
-        webView.loadUrl("file:///android_asset/RaceStory.html")
+        simulationsRecyclerView = view.findViewById<RecyclerView>(R.id.simulationsRecycleView)
 
-        setupSpinner()
-        loadWebView()
-    }
 
-    private fun setupSpinner() {
-        val simulationOptions = arrayOf<String?>(
-            "Foundation",
-            "FoundationVisualize",
-            "RaceStory",
-            "SpeedDistanceTimeAdventure",
-            "SpeedDistanceTimeSimulation"
+        parentTitleBar.visibility = View.VISIBLE
+        parentBottomNavBar.visibility = View.VISIBLE
+        // list of all available simulations
+        val simulationFiles = listOf(
+            "Foundation.html",
+            "FoundationVisualize.html",
+            "RaceStory.html",
+            "SpeedDistanceTimeAdventure.html",
+            "SpeedDistanceTimeSim.html"
         )
-        val adapter = ArrayAdapter(
-            requireContext(),
-            android.R.layout.simple_spinner_item,
-            simulationOptions
-        )
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        spinner.adapter = adapter
 
+        val simulationAdapter = SimulationAdapter(simulationFiles, ::loadSimulations)
+
+        simulationsRecyclerView.layoutManager = LinearLayoutManager(requireContext())
+        simulationsRecyclerView.adapter = simulationAdapter
     }
 
-    private fun loadWebView() {
-        spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(
-                parent: AdapterView<*>,
-                view: View?,
-                position: Int,
-                id: Long
-            ) {
-                val selectedFragment: String? = parent.getItemAtPosition(position).toString()
-                // mapping the selected option with corresponding file
-                val htmlFile = when (selectedFragment) {
-                    "Foundation" -> "Foundation.html"
-                    "FoundationVisualize" -> "FoundationVisualize.html"
-                    "RaceStory" -> "RaceStory.html"
-                    "SpeedDistanceTimeAdventure" -> "SpeedDistanceTimeAdventure.html"
-                    "SpeedDistanceTimeSimulation" -> "SpeedDistanceTimeSim.html"
-                    else -> "RaceStory.html" // default simulation
-                }
+    private fun loadSimulations(file: String) {
+        val fragment = SimulationFragment()
 
-    //                loading the selected simulation
-                webView.loadUrl("file:///android_asset/$htmlFile")
-            }
+        val bundle = Bundle()
+        bundle.putString("file", file)
+        fragment.arguments = bundle
 
-            override fun onNothingSelected(parent: AdapterView<*>?) {
-                // loading the default simulation i.e. RaceStory
-            }
-        }
+        parentFragmentManager.beginTransaction()
+            .replace(R.id.frame_layout, fragment)
+            .addToBackStack(null)
+            .commit()
     }
-
 }

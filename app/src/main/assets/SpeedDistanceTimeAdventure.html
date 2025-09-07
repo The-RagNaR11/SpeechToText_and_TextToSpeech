@@ -1,71 +1,244 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Speed-Distance-Time Adventure</title>
-<style>
-  body {
-    font-family: Arial, sans-serif;
-    margin: 0; padding: 0;
-    background: linear-gradient(to bottom, #e0f7fa, #ffffff);
-  }
-  h1 { text-align: center; margin-top: 20px; }
-  .tab-buttons {
-    text-align: center;
-    margin: 20px;
-  }
-  button {
-    padding: 10px 15px;
-    margin: 5px;
-    border: none;
-    background: #0288d1;
-    color: white;
-    border-radius: 5px;
-    cursor: pointer;
-  }
-  .tab-content { display: none; text-align: center; }
-  .active { display: block; }
-  canvas {
-    border: 1px solid #333;
-    background: #f7f7f7;
-    display: block;
-    margin: 20px auto;
-  }
-  #story-panel {
-    position: fixed;
-    right: 20px;
-    top: 80px;
-    width: 250px;
-    background: rgba(255,255,255,0.9);
-    padding: 15px;
-    border: 2px solid #0288d1;
-    border-radius: 8px;
-    box-shadow: 0px 0px 10px rgba(0,0,0,0.2);
-  }
-  #aha-message {
-    display: none;
-    position: fixed;
-    top: 40%;
-    left: 40%;
-    background: #ffeb3b;
-    padding: 20px;
-    border-radius: 10px;
-    font-weight: bold;
-    animation: fade 2s ease-in-out;
-  }
-  @keyframes fade {
-    from {opacity: 1;} to {opacity: 0;}
-  }
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Speed-Distance-Time Adventure</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(to bottom, #e0f7fa, #ffffff);
+      overflow-x: hidden;
+      touch-action: manipulation;
+    }
+
+    h1 {
+      text-align: center;
+      margin: 15px 0;
+      font-size: 1.5em;
+      padding: 0 10px;
+    }
+
+    h2 {
+      font-size: 1.3em;
+      margin: 10px 0;
+    }
+
+    .tab-buttons {
+      text-align: center;
+      margin: 10px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: center;
+    }
+
+    button {
+      padding: 12px 16px;
+      border: none;
+      background: #0288d1;
+      color: white;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+      min-height: 44px;
+      flex: 1;
+      min-width: 100px;
+      max-width: 150px;
+      touch-action: manipulation;
+    }
+
+    button:active {
+      background: #0277bd;
+      transform: scale(0.98);
+    }
+
+    .tab-content {
+      display: none;
+      text-align: center;
+      padding: 0 15px;
+      margin-bottom: 20px;
+    }
+
+    .active { display: block; }
+
+    canvas {
+      border: 2px solid #333;
+      background: #f7f7f7;
+      display: block;
+      margin: 15px auto;
+      width: 100%;
+      max-width: 350px;
+      height: 150px;
+      touch-action: none;
+    }
+
+    .control-group {
+      margin: 15px 0;
+      padding: 10px;
+      background: rgba(255,255,255,0.7);
+      border-radius: 8px;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      height: 40px;
+      -webkit-appearance: none;
+      background: transparent;
+      margin: 10px 0;
+    }
+
+    input[type="range"]::-webkit-slider-track {
+      width: 100%;
+      height: 8px;
+      background: #ddd;
+      border-radius: 4px;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      height: 30px;
+      width: 30px;
+      border-radius: 50%;
+      background: #0288d1;
+      cursor: pointer;
+      border: 2px solid white;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+
+    label {
+      display: block;
+      font-weight: bold;
+      margin: 8px 0;
+      font-size: 16px;
+      color: #333;
+    }
+
+    #story-panel {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba(255,255,255,0.95);
+      padding: 15px;
+      border-top: 3px solid #0288d1;
+      box-shadow: 0px -2px 10px rgba(0,0,0,0.2);
+      z-index: 1000;
+      transform: translateY(100%);
+      transition: transform 0.3s ease;
+    }
+
+    #story-panel.show {
+      transform: translateY(0);
+    }
+
+    #story-panel h3 {
+      margin: 0 0 10px 0;
+      color: #0288d1;
+      font-size: 1.2em;
+    }
+
+    #story-toggle {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: #0288d1;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      font-size: 20px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+      z-index: 1001;
+    }
+
+    #aha-message {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: #ffeb3b;
+      padding: 20px;
+      border-radius: 10px;
+      font-weight: bold;
+      font-size: 18px;
+      z-index: 2000;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+      animation: fadeInOut 2s ease-in-out;
+      max-width: 80%;
+      text-align: center;
+    }
+
+    @keyframes fadeInOut {
+      0% {opacity: 0; transform: translate(-50%, -50%) scale(0.8);}
+      50% {opacity: 1; transform: translate(-50%, -50%) scale(1);}
+      100% {opacity: 0; transform: translate(-50%, -50%) scale(0.8);}
+    }
+
+    .formula-display {
+      background: #e3f2fd;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 8px;
+      font-family: monospace;
+      font-size: 16px;
+      border-left: 4px solid #0288d1;
+    }
+
+    @media (max-width: 480px) {
+      h1 { font-size: 1.3em; }
+      button { font-size: 12px; padding: 10px 12px; }
+      canvas { height: 120px; }
+      .control-group { padding: 8px; }
+      label { font-size: 14px; }
+    }
+
+    @media (orientation: landscape) {
+      #story-panel {
+        position: fixed;
+        right: 0;
+        top: 60px;
+        bottom: auto;
+        left: auto;
+        width: 200px;
+        transform: translateX(100%);
+      }
+
+      #story-panel.show {
+        transform: translateX(0);
+      }
+
+      #story-toggle {
+        top: 70px;
+        bottom: auto;
+      }
+
+      .tab-content {
+        margin-right: 220px;
+      }
+    }
+  </style>
 </head>
 <body>
 
 <h1>Speed, Distance & Time Adventure</h1>
+
 <div class="tab-buttons">
-  <button onclick="openTab('concept1')">Concept 1: Speed</button>
-  <button onclick="openTab('concept2')">Concept 2: Distance</button>
-  <button onclick="openTab('concept3')">Concept 3: Time</button>
+  <button onclick="openTab('concept1')">Speed</button>
+  <button onclick="openTab('concept2')">Distance</button>
+  <button onclick="openTab('concept3')">Time</button>
 </div>
+
+<button id="story-toggle" onclick="toggleStory()">📖</button>
 
 <div id="story-panel">
   <h3>Story Mode</h3>
@@ -76,97 +249,223 @@
 
 <div id="concept1" class="tab-content">
   <h2>Understanding Speed</h2>
-  <p>Adjust speed and see how fast the object travels in 5 seconds.</p>
-  <input type="range" min="10" max="100" value="50" id="speedRange" oninput="updateSpeed()">
-  <label id="speedLabel">Speed: 50 units/sec</label>
-  <canvas id="canvas1" width="400" height="200"></canvas>
+  <p>Adjust speed and see how fast the object travels!</p>
+
+  <div class="control-group">
+    <label id="speedLabel">Speed: 50 units/sec</label>
+    <input type="range" min="10" max="100" value="50" id="speedRange" oninput="updateSpeed()">
+  </div>
+
+  <div class="formula-display">
+    Formula: Speed = Distance ÷ Time
+  </div>
+
+  <canvas id="canvas1" width="350" height="150"></canvas>
 </div>
 
 <div id="concept2" class="tab-content">
   <h2>Exploring Distance</h2>
   <p>Set speed and time to see how distance changes.</p>
-  <input type="range" min="10" max="100" value="40" id="speedRange2" oninput="updateDistance()">
-  <label id="speedLabel2">Speed: 40 units/sec</label><br>
-  <input type="range" min="1" max="10" value="5" id="timeRange2" oninput="updateDistance()">
-  <label id="timeLabel2">Time: 5 sec</label>
-  <canvas id="canvas2" width="400" height="200"></canvas>
+
+  <div class="control-group">
+    <label id="speedLabel2">Speed: 40 units/sec</label>
+    <input type="range" min="10" max="100" value="40" id="speedRange2" oninput="updateDistance()">
+
+    <label id="timeLabel2">Time: 5 sec</label>
+    <input type="range" min="1" max="10" value="5" id="timeRange2" oninput="updateDistance()">
+  </div>
+
+  <div class="formula-display">
+    Formula: Distance = Speed × Time
+  </div>
+
+  <canvas id="canvas2" width="350" height="150"></canvas>
 </div>
 
 <div id="concept3" class="tab-content">
   <h2>Calculating Time</h2>
   <p>Set distance and speed to see how long it takes to travel.</p>
-  <input type="range" min="100" max="500" value="300" id="distanceRange3" oninput="updateTime()">
-  <label id="distanceLabel3">Distance: 300 units</label><br>
-  <input type="range" min="10" max="100" value="60" id="speedRange3" oninput="updateTime()">
-  <label id="speedLabel3">Speed: 60 units/sec</label>
-  <canvas id="canvas3" width="400" height="200"></canvas>
+
+  <div class="control-group">
+    <label id="distanceLabel3">Distance: 300 units</label>
+    <input type="range" min="100" max="500" value="300" id="distanceRange3" oninput="updateTime()">
+
+    <label id="speedLabel3">Speed: 60 units/sec</label>
+    <input type="range" min="10" max="100" value="60" id="speedRange3" oninput="updateTime()">
+  </div>
+
+  <div class="formula-display">
+    Formula: Time = Distance ÷ Speed
+  </div>
+
+  <canvas id="canvas3" width="350" height="150"></canvas>
 </div>
 
 <script>
-function openTab(tabId) {
-  document.querySelectorAll('.tab-content').forEach(el => el.style.display = 'none');
-  document.getElementById(tabId).style.display = 'block';
-  let textMap = {
-    concept1: "Chapter 1: You are racing a car. Discover how changing speed affects movement!",
-    concept2: "Chapter 2: Measure the journey! See how distance depends on speed and time.",
-    concept3: "Chapter 3: Timing is everything. Calculate how long to reach your goal!"
-  };
-  document.getElementById("story-text").innerText = textMap[tabId];
-  showAha();
-}
+  let storyVisible = false;
 
-// Aha Popup
-function showAha(){
-  let aha = document.getElementById("aha-message");
-  aha.style.display = "block";
-  setTimeout(() => aha.style.display = "none", 2000);
-}
+  function toggleStory() {
+    const panel = document.getElementById('story-panel');
+    storyVisible = !storyVisible;
+    panel.classList.toggle('show', storyVisible);
+  }
 
-// Concept 1 Animation
-let ctx1 = document.getElementById('canvas1').getContext('2d');
-let speed1 = 50, pos1 = 10;
-function updateSpeed(){
-  speed1 = document.getElementById('speedRange').value;
-  document.getElementById('speedLabel').innerText = `Speed: ${speed1} units/sec`;
-}
-function animate1(){
-  ctx1.clearRect(0,0,400,200);
-  ctx1.fillStyle = "red";
-  ctx1.fillRect(pos1, 80, 20, 20);
-  pos1 += speed1/50;
-  if(pos1 > 400) pos1 = 0;
-  requestAnimationFrame(animate1);
-}
-animate1();
+  function openTab(tabId) {
+    document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+    document.getElementById(tabId).classList.add('active');
 
-// Concept 2
-let ctx2 = document.getElementById('canvas2').getContext('2d');
-function updateDistance(){
-  let s = document.getElementById('speedRange2').value;
-  let t = document.getElementById('timeRange2').value;
-  document.getElementById('speedLabel2').innerText = `Speed: ${s} units/sec`;
-  document.getElementById('timeLabel2').innerText = `Time: ${t} sec`;
-  let d = s * t;
-  ctx2.clearRect(0,0,400,200);
-  ctx2.fillStyle = "blue";
-  ctx2.fillRect(10, 80, d/5, 20); 
-}
-updateDistance();
+    let textMap = {
+      concept1: "Chapter 1: You are racing a car. Discover how changing speed affects movement! The faster you go, the more distance you cover in the same time.",
+      concept2: "Chapter 2: Measure the journey! See how distance depends on speed and time. More speed or more time means greater distance traveled.",
+      concept3: "Chapter 3: Timing is everything. Calculate how long to reach your goal! Greater distance takes more time, but higher speed reduces travel time."
+    };
 
-// Concept 3
-let ctx3 = document.getElementById('canvas3').getContext('2d');
-function updateTime(){
-  let d = document.getElementById('distanceRange3').value;
-  let s = document.getElementById('speedRange3').value;
-  document.getElementById('distanceLabel3').innerText = `Distance: ${d} units`;
-  document.getElementById('speedLabel3').innerText = `Speed: ${s} units/sec`;
-  let t = d / s;
-  ctx3.clearRect(0,0,400,200);
-  ctx3.fillStyle = "green";
-  ctx3.fillRect(10, 80, d/5, 20);
-  ctx3.fillText(`Time: ${t.toFixed(2)} sec`, 150, 150);
-}
-updateTime();
+    document.getElementById("story-text").innerHTML = textMap[tabId];
+    showAha();
+
+    // Show story panel temporarily on tab change
+    const panel = document.getElementById('story-panel');
+    panel.classList.add('show');
+    setTimeout(() => {
+      if (!storyVisible) {
+        panel.classList.remove('show');
+      }
+    }, 3000);
+  }
+
+  // Aha Popup
+  function showAha(){
+    let aha = document.getElementById("aha-message");
+    aha.style.display = "block";
+    setTimeout(() => aha.style.display = "none", 2000);
+  }
+
+  // Concept 1 Animation
+  let canvas1 = document.getElementById('canvas1');
+  let ctx1 = canvas1.getContext('2d');
+  let speed1 = 50, pos1 = 10;
+
+  function resizeCanvas() {
+    const canvases = document.querySelectorAll('canvas');
+    canvases.forEach(canvas => {
+      const rect = canvas.getBoundingClientRect();
+      canvas.width = rect.width;
+      canvas.height = rect.height;
+    });
+  }
+
+  window.addEventListener('resize', resizeCanvas);
+  window.addEventListener('orientationchange', () => {
+    setTimeout(resizeCanvas, 100);
+  });
+
+  function updateSpeed(){
+    speed1 = document.getElementById('speedRange').value;
+    document.getElementById('speedLabel').innerText = `Speed: ${speed1} units/sec`;
+  }
+
+  function animate1(){
+    const canvas = document.getElementById('canvas1');
+    const rect = canvas.getBoundingClientRect();
+    ctx1.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Draw track
+    ctx1.strokeStyle = "#ccc";
+    ctx1.lineWidth = 2;
+    ctx1.beginPath();
+    ctx1.moveTo(10, canvas.height/2 + 20);
+    ctx1.lineTo(canvas.width - 10, canvas.height/2 + 20);
+    ctx1.stroke();
+
+    // Draw moving object
+    ctx1.fillStyle = "red";
+    ctx1.fillRect(pos1, canvas.height/2, 20, 20);
+
+    pos1 += speed1/30;
+    if(pos1 > canvas.width - 20) pos1 = 10;
+
+    requestAnimationFrame(animate1);
+  }
+
+  // Concept 2
+  let canvas2 = document.getElementById('canvas2');
+  let ctx2 = canvas2.getContext('2d');
+
+  function updateDistance(){
+    let s = document.getElementById('speedRange2').value;
+    let t = document.getElementById('timeRange2').value;
+    document.getElementById('speedLabel2').innerText = `Speed: ${s} units/sec`;
+    document.getElementById('timeLabel2').innerText = `Time: ${t} sec`;
+
+    let d = s * t;
+    const canvas = document.getElementById('canvas2');
+
+    ctx2.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Draw scale
+    ctx2.strokeStyle = "#ccc";
+    ctx2.lineWidth = 1;
+    for(let i = 0; i < canvas.width; i += 50) {
+      ctx2.beginPath();
+      ctx2.moveTo(i, canvas.height - 30);
+      ctx2.lineTo(i, canvas.height - 20);
+      ctx2.stroke();
+    }
+
+    // Draw distance bar
+    ctx2.fillStyle = "blue";
+    let barWidth = Math.min((d * canvas.width) / 1000, canvas.width - 20);
+    ctx2.fillRect(10, canvas.height/2, barWidth, 30);
+
+    // Display calculation
+    ctx2.fillStyle = "black";
+    ctx2.font = "14px Arial";
+    ctx2.fillText(`Distance: ${d} units`, 10, 30);
+    ctx2.fillText(`${s} × ${t} = ${d}`, 10, 50);
+  }
+
+  // Concept 3
+  let canvas3 = document.getElementById('canvas3');
+  let ctx3 = canvas3.getContext('2d');
+
+  function updateTime(){
+    let d = document.getElementById('distanceRange3').value;
+    let s = document.getElementById('speedRange3').value;
+    document.getElementById('distanceLabel3').innerText = `Distance: ${d} units`;
+    document.getElementById('speedLabel3').innerText = `Speed: ${s} units/sec`;
+
+    let t = d / s;
+    const canvas = document.getElementById('canvas3');
+
+    ctx3.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Draw distance representation
+    ctx3.fillStyle = "green";
+    let barWidth = (d * canvas.width) / 500;
+    ctx3.fillRect(10, canvas.height/2, Math.min(barWidth, canvas.width - 20), 30);
+
+    // Display calculation
+    ctx3.fillStyle = "black";
+    ctx3.font = "14px Arial";
+    ctx3.fillText(`Time needed: ${t.toFixed(2)} seconds`, 10, 30);
+    ctx3.fillText(`${d} ÷ ${s} = ${t.toFixed(2)}`, 10, 50);
+
+    // Draw clock representation
+    ctx3.strokeStyle = "purple";
+    ctx3.lineWidth = 3;
+    ctx3.beginPath();
+    ctx3.arc(canvas.width - 50, 50, 25, 0, (t/10) * 2 * Math.PI);
+    ctx3.stroke();
+  }
+
+  // Initialize
+  setTimeout(() => {
+    resizeCanvas();
+    openTab('concept1');
+    animate1();
+    updateDistance();
+    updateTime();
+  }, 100);
 </script>
 </body>
 </html>
