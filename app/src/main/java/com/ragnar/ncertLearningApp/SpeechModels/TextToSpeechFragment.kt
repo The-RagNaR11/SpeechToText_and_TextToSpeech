@@ -1,4 +1,4 @@
-package com.ragnar.SpeechModel.SpeechModels
+package com.ragnar.ncertLearningApp.SpeechModels
 
 import android.os.Bundle
 import android.speech.tts.TextToSpeech
@@ -16,7 +16,7 @@ import android.widget.SeekBar
 import android.widget.Spinner
 import android.widget.TextView
 import android.widget.Toast
-import com.ragnar.SpeechModel.R
+import com.ragnar.ncertLearningApp.R
 import java.util.Locale
 
 /*

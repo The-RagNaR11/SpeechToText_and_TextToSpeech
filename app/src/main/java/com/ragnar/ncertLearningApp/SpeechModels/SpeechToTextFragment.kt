@@ -1,4 +1,4 @@
-package com.ragnar.SpeechModel.SpeechModels
+package com.ragnar.ncertLearningApp.SpeechModels
 
 import android.Manifest
 import android.content.Intent
@@ -20,7 +20,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import com.ragnar.SpeechModel.R
+import com.ragnar.ncertLearningApp.R
 import java.util.Locale
 
 class SpeechToTextFragment : Fragment() {

@@ -1,4 +1,4 @@
-package com.ragnar.SpeechModel.Simulations
+package com.ragnar.ncertLearningApp.Simulations
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -9,9 +9,15 @@ import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Spinner
 import androidx.fragment.app.Fragment
-import com.ragnar.SpeechModel.R
+import com.ragnar.ncertLearningApp.R
 
+/*
+this fragment class used to set up a spinner that
+contains list of all simulations
 
+loads the RaceStory simulation by default and changes the simulation on the
+basis of selected item on sinner i.e. dropdown menu
+ */
 class LoadSimulationFragment : Fragment() {
 
     private lateinit var webView: WebView

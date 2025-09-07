@@ -1,4 +1,4 @@
-package com.ragnar.SpeechModel
+package com.ragnar.ncertLearningApp
 
 import org.junit.Test
 

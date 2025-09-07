@@ -1,11 +1,11 @@
-package com.ragnar.SpeechModel
+package com.ragnar.ncertLearningApp
 
 import android.os.Bundle
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
-import com.ragnar.SpeechModel.Simulations.LoadSimulationFragment
-import com.ragnar.SpeechModel.SpeechModels.SpeechToTextFragment
-import com.ragnar.SpeechModel.SpeechModels.TextToSpeechFragment
+import com.ragnar.ncertLearningApp.Simulations.LoadSimulationFragment
+import com.ragnar.ncertLearningApp.SpeechModels.SpeechToTextFragment
+import com.ragnar.ncertLearningApp.SpeechModels.TextToSpeechFragment
 
 class MainActivity : AppCompatActivity() {
 

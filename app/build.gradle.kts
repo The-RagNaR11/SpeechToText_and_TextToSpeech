@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace = "com.ragnar.SpeechModel"
+    namespace = "com.ragnar.ncertLearningApp"
     compileSdk = 36
 
     defaultConfig {
