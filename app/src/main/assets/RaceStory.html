@@ -1,0 +1,999 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no" />
+  <title>Race Story — Learn Speed · Distance · Time</title>
+
+  <!-- Chart.js for small graphs -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    :root{
+      --bg:#f6fbff; --card:#fff; --accent:#0b74da; --muted:#556;
+      --good:#1f9d55; --warn:#f6a623; --bad:#d64545;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:Inter,system-ui,Segoe UI,Roboto,Arial;
+      background:var(--bg);
+      color:#0b1220;
+      font-size:16px;
+      line-height:1.4;
+      -webkit-text-size-adjust: 100%;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    header{
+      background:linear-gradient(90deg,var(--accent),#2aa0f3);
+      color:white;
+      padding:12px 16px;
+      position:sticky;
+      top:0;
+      z-index:100;
+      box-shadow:0 2px 8px rgba(0,0,0,0.1);
+    }
+    header h1{
+      margin:0;
+      font-size:18px;
+      font-weight:600;
+    }
+
+    .app{
+      display:flex;
+      flex-direction:column;
+      min-height:calc(100vh - 60px);
+      padding:12px;
+      gap:12px;
+    }
+
+    .main{
+      order:1;
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+    }
+
+    .side{
+      order:2;
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+    }
+
+    .tabs{
+      display:flex;
+      gap:6px;
+      overflow-x:auto;
+      padding-bottom:4px;
+    }
+
+    .tab-btn{
+      padding:12px 16px;
+      border-radius:12px;
+      border:none;
+      background:rgba(0,0,0,0.06);
+      cursor:pointer;
+      font-size:14px;
+      font-weight:500;
+      white-space:nowrap;
+      min-width:120px;
+      text-align:center;
+      transition:all 0.2s;
+    }
+
+    .tab-btn.active{
+      background:var(--card);
+      box-shadow:0 4px 12px rgba(11,116,218,0.15);
+      color:var(--accent);
+      transform:translateY(-1px);
+    }
+
+    .card{
+      background:var(--card);
+      border-radius:16px;
+      padding:16px;
+      box-shadow:0 2px 8px rgba(20,30,60,0.06);
+      border:1px solid rgba(11,116,218,0.08);
+    }
+
+    .track{
+      height:120px;
+      border-radius:12px;
+      background:linear-gradient(90deg,#eee,#ddd);
+      position:relative;
+      overflow:hidden;
+      border:2px solid #e2e8f0;
+      margin:12px 0;
+    }
+
+    .runner{
+      position:absolute;
+      width:44px;
+      height:44px;
+      border-radius:12px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-weight:700;
+      color:white;
+      box-shadow:0 4px 12px rgba(20,30,60,0.15);
+      font-size:16px;
+    }
+
+    .runner.riya{background:#ff6b6b;top:15px}
+    .runner.arjun{background:#4f8cff;top:60px}
+
+    .controls{
+      display:flex;
+      flex-direction:column;
+      gap:16px;
+      margin:16px 0;
+    }
+
+    .control-group{
+      background:rgba(11,116,218,0.03);
+      padding:14px;
+      border-radius:12px;
+      border:1px solid rgba(11,116,218,0.1);
+    }
+
+    label{
+      font-size:14px;
+      color:var(--muted);
+      display:block;
+      margin-bottom:8px;
+      font-weight:500;
+    }
+
+    .label-value{
+      color:var(--accent);
+      font-weight:600;
+      font-size:16px;
+    }
+
+    input[type=range]{
+      width:100%;
+      height:6px;
+      border-radius:3px;
+      background:#e2e8f0;
+      outline:none;
+      -webkit-appearance:none;
+      margin:8px 0;
+    }
+
+    input[type=range]::-webkit-slider-thumb{
+      -webkit-appearance:none;
+      width:24px;
+      height:24px;
+      border-radius:50%;
+      background:var(--accent);
+      cursor:pointer;
+      box-shadow:0 2px 8px rgba(11,116,218,0.3);
+    }
+
+    input[type=range]::-moz-range-thumb{
+      width:24px;
+      height:24px;
+      border-radius:50%;
+      background:var(--accent);
+      cursor:pointer;
+      border:none;
+      box-shadow:0 2px 8px rgba(11,116,218,0.3);
+    }
+
+    input[type=number], select{
+      width:100%;
+      padding:12px;
+      border-radius:8px;
+      border:2px solid #e6eefc;
+      font-size:16px;
+      background:white;
+      transition:border-color 0.2s;
+    }
+
+    input[type=number]:focus, select:focus{
+      outline:none;
+      border-color:var(--accent);
+    }
+
+    .row{
+      display:flex;
+      gap:8px;
+      align-items:center;
+      flex-wrap:wrap;
+    }
+
+    .btn{
+      padding:12px 20px;
+      border-radius:12px;
+      border:none;
+      background:var(--accent);
+      color:white;
+      cursor:pointer;
+      font-size:16px;
+      font-weight:600;
+      transition:all 0.2s;
+      min-height:48px;
+      touch-action:manipulation;
+    }
+
+    .btn:active{
+      transform:scale(0.98);
+    }
+
+    .btn.secondary{
+      background:#fff;
+      border:2px solid #cfe6ff;
+      color:var(--accent);
+    }
+
+    .btn.full{
+      width:100%;
+      margin:8px 0;
+    }
+
+    .muted{
+      color:var(--muted);
+      font-size:14px;
+    }
+
+    .story{
+      min-height:80px;
+    }
+
+    .predict-box{
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+      margin-top:12px;
+    }
+
+    .predict-row{
+      display:flex;
+      gap:8px;
+    }
+
+    .feedback{
+      margin-top:12px;
+      font-weight:600;
+      padding:12px;
+      border-radius:8px;
+      background:rgba(0,0,0,0.02);
+      font-size:14px;
+    }
+
+    canvas{
+      background:white;
+      border-radius:12px;
+      padding:8px;
+      width:100% !important;
+      max-height:200px;
+    }
+
+    .small{
+      font-size:14px;
+      color:var(--muted);
+    }
+
+    .stats-row{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin:12px 0;
+      padding:12px;
+      background:rgba(11,116,218,0.03);
+      border-radius:8px;
+      flex-wrap:wrap;
+      gap:8px;
+    }
+
+    .stat{
+      font-size:14px;
+      color:var(--muted);
+    }
+
+    .stat-value{
+      font-weight:600;
+      color:var(--accent);
+    }
+
+    footer{
+      padding:16px;
+      text-align:center;
+      color:var(--muted);
+      font-size:14px;
+      border-top:1px solid #e2e8f0;
+      margin-top:20px;
+    }
+
+    h2{
+      margin:0 0 8px 0;
+      font-size:20px;
+      font-weight:600;
+      color:#0b1220;
+    }
+
+    h3{
+      margin:0 0 12px 0;
+      font-size:18px;
+      font-weight:600;
+      color:#0b1220;
+    }
+
+    h4{
+      margin:8px 0;
+      font-size:16px;
+      font-weight:600;
+      color:var(--muted);
+    }
+
+    ul{
+      margin:8px 0;
+      padding-left:20px;
+    }
+
+    li{
+      margin:4px 0;
+      line-height:1.4;
+    }
+
+    /* Progress section optimization for mobile */
+    .progress-item{
+      margin-bottom:8px;
+      padding:8px;
+      background:rgba(0,0,0,0.02);
+      border-radius:6px;
+      font-size:12px;
+      word-break:break-all;
+    }
+
+    /* Chart container */
+    .chart-container{
+      margin-top:16px;
+      position:relative;
+    }
+
+    /* Touch improvements */
+    .touch-target{
+      min-height:44px;
+      min-width:44px;
+    }
+
+    /* Better spacing for mobile */
+    @media (max-width: 480px) {
+      .app{
+        padding:8px;
+      }
+
+      .card{
+        padding:12px;
+      }
+
+      header{
+        padding:10px 12px;
+      }
+
+      header h1{
+        font-size:16px;
+      }
+
+      .track{
+        height:100px;
+      }
+
+      .runner{
+        width:36px;
+        height:36px;
+        font-size:14px;
+      }
+
+      .runner.riya{top:12px}
+      .runner.arjun{top:52px}
+
+      .btn{
+        padding:10px 16px;
+        font-size:15px;
+      }
+
+      .tab-btn{
+        padding:10px 12px;
+        min-width:100px;
+        font-size:13px;
+      }
+    }
+  </style>
+</head>
+<body>
+<header><h1>Riya vs Arjun — Race Story: Speed, Distance & Time</h1></header>
+
+<div class="app">
+  <div class="main">
+    <!-- Tabs -->
+    <div class="card">
+      <div class="tabs">
+        <button class="tab-btn active touch-target" id="tabDistance">Distance Mode</button>
+        <button class="tab-btn touch-target" id="tabSpeed">Speed Mode</button>
+        <button class="tab-btn touch-target" id="tabFormula">Formula Puzzle</button>
+      </div>
+    </div>
+
+    <!-- Distance Mode -->
+    <div class="card" id="panelDistance">
+      <h2>Distance Discovery — who travels farther?</h2>
+      <p class="small">Story: Riya and Arjun start together. You control speeds — who covers more distance in the time window?</p>
+
+      <div class="track" id="trackD">
+        <div class="runner riya" id="riyaD" style="left:8px">R</div>
+        <div class="runner arjun" id="arjunD" style="left:8px">A</div>
+      </div>
+
+      <div class="controls">
+        <div class="control-group">
+          <label>Riya's speed (m/s): <span class="label-value" id="spdR_D">5</span></label>
+          <input type="range" id="spdR_D_range" min="0.5" max="15" step="0.1" value="5">
+        </div>
+
+        <div class="control-group">
+          <label>Arjun's speed (m/s): <span class="label-value" id="spdA_D">7</span></label>
+          <input type="range" id="spdA_D_range" min="0.5" max="15" step="0.1" value="7">
+        </div>
+
+        <div class="control-group">
+          <label>Time window (seconds): <span class="label-value" id="timeWindow_D">10</span></label>
+          <input type="range" id="timeWindow_D_range" min="2" max="30" step="1" value="10">
+        </div>
+
+        <div class="control-group">
+          <label>Prediction: Who travels farther in the window?</label>
+          <div class="predict-box">
+            <select id="predictWho_D" class="touch-target">
+              <option value="Riya">Riya</option>
+              <option value="Arjun">Arjun</option>
+              <option value="Tie">Tie</option>
+            </select>
+            <div class="predict-row">
+              <button class="btn touch-target" id="checkPred_D" style="flex:1">Check Prediction</button>
+              <button class="btn secondary touch-target" id="resetD">Reset</button>
+            </div>
+          </div>
+          <div id="feedbackD" class="feedback muted"></div>
+        </div>
+      </div>
+
+      <div class="stats-row">
+        <div class="stat">Riya: <span class="stat-value" id="distR_D">0</span> m</div>
+        <div class="stat">Arjun: <span class="stat-value" id="distA_D">0</span> m</div>
+        <button class="btn touch-target" id="runD">Simulate</button>
+      </div>
+
+      <div class="chart-container card">
+        <h4>Distance vs Time</h4>
+        <canvas id="chartD" height="120"></canvas>
+      </div>
+    </div>
+
+    <!-- Speed Mode -->
+    <div class="card" id="panelSpeed" style="display:none">
+      <h2>Speed Challenge — same distance, who wins?</h2>
+      <p class="small">Story: They race same distance. Find the minimum speed needed to beat the other runner.</p>
+
+      <div class="track" id="trackS">
+        <div class="runner riya" id="riyaS" style="left:8px">R</div>
+        <div class="runner arjun" id="arjunS" style="left:8px">A</div>
+      </div>
+
+      <div class="controls">
+        <div class="control-group">
+          <label>Race distance (meters): <span class="label-value" id="raceDist_S">150</span></label>
+          <input type="range" id="raceDist_S_range" min="30" max="600" step="5" value="150">
+        </div>
+
+        <div class="control-group">
+          <label>Riya's speed (m/s): <span class="label-value" id="spdR_S">6</span></label>
+          <input type="range" id="spdR_S_range" min="0.5" max="20" step="0.1" value="6">
+        </div>
+
+        <div class="control-group">
+          <label>Arjun's speed (m/s): <span class="label-value" id="spdA_S">6</span></label>
+          <input type="range" id="spdA_S_range" min="0.5" max="20" step="0.1" value="6">
+        </div>
+
+        <div class="control-group">
+          <label>Prediction: Minimum speed for Riya to beat Arjun?</label>
+          <div class="predict-box">
+            <input type="number" id="predictSpeed_S" placeholder="Enter speed in m/s" class="touch-target" />
+            <div class="predict-row">
+              <button class="btn touch-target" id="checkPred_S" style="flex:1">Check Prediction</button>
+              <button class="btn secondary touch-target" id="resetS">Reset</button>
+            </div>
+          </div>
+          <div id="feedbackS" class="feedback muted"></div>
+        </div>
+      </div>
+
+      <div class="stats-row">
+        <div class="stat">Riya time: <span class="stat-value" id="timeR_S">0</span> s</div>
+        <div class="stat">Arjun time: <span class="stat-value" id="timeA_S">0</span> s</div>
+        <button class="btn touch-target" id="runS">Simulate Race</button>
+      </div>
+
+      <div class="chart-container card">
+        <h4>Distance vs Time (race)</h4>
+        <canvas id="chartS" height="120"></canvas>
+      </div>
+    </div>
+
+    <!-- Formula Puzzle -->
+    <div class="card" id="panelFormula" style="display:none">
+      <h2>Formula Puzzle — find the missing variable</h2>
+      <p class="small">Story: Fill two values and solve the third using Speed = Distance ÷ Time.</p>
+
+      <div class="controls">
+        <div class="control-group">
+          <label>Hide which variable?</label>
+          <select id="hideVarF" class="touch-target">
+            <option value="speed">Hide Speed</option>
+            <option value="distance">Hide Distance</option>
+            <option value="time">Hide Time</option>
+          </select>
+        </div>
+
+        <div class="control-group">
+          <label>Speed (m/s)</label>
+          <input type="number" id="speedF" step="0.1" value="5" class="touch-target">
+        </div>
+
+        <div class="control-group">
+          <label>Distance (meters)</label>
+          <input type="number" id="distanceF" step="0.1" value="120" class="touch-target">
+        </div>
+
+        <div class="control-group">
+          <label>Time (seconds)</label>
+          <input type="number" id="timeF" step="0.1" value="24" class="touch-target">
+        </div>
+      </div>
+
+      <div class="control-group">
+        <label>Make your prediction for the hidden value</label>
+        <div class="predict-box">
+          <input type="number" id="predictF" placeholder="Your guess" class="touch-target" />
+          <div class="predict-row">
+            <button class="btn touch-target" id="checkF" style="flex:1">Check</button>
+            <button class="btn secondary touch-target" id="revealF">Reveal</button>
+          </div>
+        </div>
+        <div id="feedbackF" class="feedback muted"></div>
+        <div class="small" style="margin-top:12px;padding:8px;background:rgba(31,157,85,0.1);border-radius:6px;">
+          <strong>Formulas:</strong><br>
+          Speed = Distance ÷ Time<br>
+          Distance = Speed × Time<br>
+          Time = Distance ÷ Speed
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Side: Story + instructions + progress -->
+  <div class="side">
+    <div class="card story" id="storyCard">
+      <h3>📖 Story & Instructions</h3>
+      <div id="storyText">
+        <p><strong>Welcome!</strong> Riya and Arjun are racing. Use the controls to set speeds and distances, make predictions, then run simulations to see what happens!</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>💡 Quick Tips</h3>
+      <ul class="small">
+        <li>Speed (m/s) = Distance (m) ÷ Time (s)</li>
+        <li>Same time → higher speed = more distance</li>
+        <li>Same distance → higher speed = less time</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>📊 Progress</h3>
+      <div id="progressBox" class="small">No attempts yet. Your predictions and results will appear here.</div>
+    </div>
+  </div>
+</div>
+
+<footer>Try: Predict → Simulate → Explain. That's how you build understanding! 🚀</footer>
+
+<script>
+  /* ------------------------
+     Helpers & state
+     ------------------------ */
+  const show = (id)=>{ document.getElementById(id).style.display = 'block' }
+  const hide = (id)=>{ document.getElementById(id).style.display = 'none' }
+  const setText=(id,txt)=>{ document.getElementById(id).textContent = txt }
+  const toFixed=(v,n=2)=> parseFloat(v).toFixed(n)
+
+  // Tab switching
+  document.getElementById('tabDistance').onclick = ()=>{ activateTab('Distance') }
+  document.getElementById('tabSpeed').onclick = ()=>{ activateTab('Speed') }
+  document.getElementById('tabFormula').onclick = ()=>{ activateTab('Formula') }
+
+  function activateTab(name){
+    // buttons
+    ['tabDistance','tabSpeed','tabFormula'].forEach(id=>document.getElementById(id).classList.remove('active'))
+    if(name==='Distance'){ document.getElementById('tabDistance').classList.add('active'); show('panelDistance'); hide('panelSpeed'); hide('panelFormula'); updateStory('Distance') }
+    if(name==='Speed'){ document.getElementById('tabSpeed').classList.add('active'); hide('panelDistance'); show('panelSpeed'); hide('panelFormula'); updateStory('Speed') }
+    if(name==='Formula'){ document.getElementById('tabFormula').classList.add('active'); hide('panelDistance'); hide('panelSpeed'); show('panelFormula'); updateStory('Formula') }
+  }
+
+  function updateStory(tab){
+    const story = document.getElementById('storyText')
+    if(tab==='Distance'){
+      story.innerHTML = `<p><strong>📏 Distance Discovery</strong><br>Riya and Arjun start together. You control their speeds. Predict who covers more ground in the time window — then run the simulation!</p>`
+    } else if(tab==='Speed'){
+      story.innerHTML = `<p><strong>🏃 Speed Challenge</strong><br>They're racing the same distance. Your job: find how fast Riya needs to be to beat Arjun. Make your prediction and test it!</p>`
+    } else {
+      story.innerHTML = `<p><strong>🧮 Formula Puzzle</strong><br>Use the relationship between Speed, Distance, and Time. Fill two values and calculate the third to help solve the challenge!</p>`
+    }
+  }
+
+  /* ------------------------
+     Distance Mode Logic
+     ------------------------ */
+  const spdR_D_range = document.getElementById('spdR_D_range'), spdA_D_range = document.getElementById('spdA_D_range'), timeWindow_D_range = document.getElementById('timeWindow_D_range')
+  const riyaD = document.getElementById('riyaD'), arjunD = document.getElementById('arjunD'), trackD = document.getElementById('trackD')
+  let chartD = null
+
+  function updateDistanceUI(){
+    setText('spdR_D', toFixed(spdR_D_range.value,1))
+    setText('spdA_D', toFixed(spdA_D_range.value,1))
+    setText('timeWindow_D', timeWindow_D_range.value)
+  }
+  spdR_D_range.oninput = updateDistanceUI; spdA_D_range.oninput = updateDistanceUI; timeWindow_D_range.oninput = updateDistanceUI
+  updateDistanceUI()
+
+  // simulate for the time window; show who covered more
+  document.getElementById('runD').onclick = ()=>{
+    // compute distances
+    const vR = parseFloat(spdR_D_range.value), vA=parseFloat(spdA_D_range.value), T=parseFloat(timeWindow_D_range.value);
+    const dR = vR * T, dA = vA * T
+    setText('distR_D', toFixed(dR,2)); setText('distA_D', toFixed(dA,2))
+
+    // animate on track proportionally to distances
+    const trackWidth = trackD.offsetWidth - riyaD.offsetWidth - 8
+    const maxD = Math.max(dR,dA,1)
+    const totalSteps = 60; let step=0
+    const startLeft = 8
+    const leftR_end = startLeft + (dR / maxD) * trackWidth
+    const leftA_end = startLeft + (dA / maxD) * trackWidth
+
+    // chart data
+    const labels = []; const dataR=[]; const dataA=[]
+    for(let i=0;i<=totalSteps;i++){
+      labels.push((i/totalSteps * T).toFixed(2))
+      dataR.push((vR * (i/totalSteps * T)).toFixed(2))
+      dataA.push((vA * (i/totalSteps * T)).toFixed(2))
+    }
+    updateChartD(labels,dataR,dataA)
+
+    // animate
+    const id = setInterval(()=>{
+      step++; const pct = step/totalSteps
+      riyaD.style.left = (startLeft + (leftR_end - startLeft) * pct) + 'px'
+      arjunD.style.left = (startLeft + (leftA_end - startLeft) * pct) + 'px'
+      if(step>=totalSteps) clearInterval(id)
+    }, 35)
+
+    // give story feedback
+    let msg = `In ${T}s: Riya covered ${toFixed(dR,2)}m, Arjun covered ${toFixed(dA,2)}m. `
+    if(Math.abs(dR-dA) < 1e-6) msg += 'It\'s a tie! 🤝'
+    else msg += `${dR>dA? 'Riya' : 'Arjun'} traveled farther! ${dR>dA? '🔴' : '🔵'}`
+
+    setText('feedbackD', msg); updateProgress({mode:'distance',vR,dR,vA,dA,T, result: (dR>dA? 'Riya' : (dA>dR? 'Arjun':'Tie'))})
+  }
+
+  // prediction check
+  document.getElementById('checkPred_D').onclick = ()=>{
+    const pred = document.getElementById('predictWho_D').value
+    const vR = parseFloat(spdR_D_range.value), vA=parseFloat(spdA_D_range.value), T=parseFloat(timeWindow_D_range.value)
+    const dR = vR*T, dA=vA*T
+    const actual = (Math.abs(dR-dA)<1e-6 ? 'Tie' : (dR>dA? 'Riya' : 'Arjun'))
+    const fb = document.getElementById('feedbackD')
+    if(pred===actual){
+      fb.style.color='var(--good)'; fb.style.background='rgba(31,157,85,0.1)'
+      fb.textContent = `🎉 Excellent! You predicted ${pred} and you're correct! (${toFixed(dR,2)}m vs ${toFixed(dA,2)}m)`
+    } else {
+      fb.style.color='var(--warn)'; fb.style.background='rgba(246,166,35,0.1)'
+      fb.textContent = `🤔 Close! You predicted ${pred} but actual is ${actual}. (${toFixed(dR,2)}m vs ${toFixed(dA,2)}m)`
+    }
+    updateProgress({mode:'distance_pred',predict:pred,actual:actual})
+  }
+
+  document.getElementById('resetD').onclick = ()=>{
+    riyaD.style.left='8px'; arjunD.style.left='8px'; setText('distR_D','0'); setText('distA_D','0');
+    const fb = document.getElementById('feedbackD')
+    fb.textContent=''; fb.style.background=''; fb.style.color=''
+    if(chartD) { chartD.data.labels=[]; chartD.data.datasets[0].data=[]; chartD.data.datasets[1].data=[]; chartD.update(); }
+  }
+
+  function initChartD(){
+    const ctx = document.getElementById('chartD').getContext('2d')
+    chartD = new Chart(ctx,{type:'line',data:{labels:[],datasets:[
+      {label:'Riya distance (m)',data:[],borderColor:'#ff7b7b',backgroundColor:'rgba(255,123,123,0.1)',fill:false,tension:0.1},
+      {label:'Arjun distance (m)',data:[],borderColor:'#4f8cff',backgroundColor:'rgba(79,140,255,0.1)',fill:false,tension:0.1}
+    ]}, options:{
+      responsive:true,
+      plugins:{legend:{position:'top',labels:{usePointStyle:true}}},
+      scales:{y:{beginAtZero:true,title:{display:true,text:'Distance (m)'}},x:{title:{display:true,text:'Time (s)'}}},
+      elements:{point:{radius:2}}
+    }})
+  }
+  function updateChartD(labels,dR,dA){ if(chartD){ chartD.data.labels = labels; chartD.data.datasets[0].data = dR; chartD.data.datasets[1].data = dA; chartD.update(); } }
+
+  /* ------------------------
+     Speed Mode Logic
+     ------------------------ */
+  const raceDist_S_range = document.getElementById('raceDist_S_range'), spdR_S_range = document.getElementById('spdR_S_range'), spdA_S_range = document.getElementById('spdA_S_range')
+  const riyaS = document.getElementById('riyaS'), arjunS = document.getElementById('arjunS'), trackS = document.getElementById('trackS')
+  let chartS = null
+
+  function updateSpeedUI(){
+    setText('raceDist_S', raceDist_S_range.value)
+    setText('spdR_S', toFixed(spdR_S_range.value,1))
+    setText('spdA_S', toFixed(spdA_S_range.value,1))
+  }
+  raceDist_S_range.oninput = updateSpeedUI; spdR_S_range.oninput = updateSpeedUI; spdA_S_range.oninput = updateSpeedUI
+  updateSpeedUI()
+
+  document.getElementById('runS').onclick = ()=>{
+    const D = parseFloat(raceDist_S_range.value), vR = parseFloat(spdR_S_range.value), vA = parseFloat(spdA_S_range.value)
+    // times
+    const tR = vR>0 ? D / vR : Infinity, tA = vA>0 ? D / vA : Infinity
+    setText('timeR_S', toFixed(tR,2)); setText('timeA_S', toFixed(tA,2))
+
+    // animate: we map distance -> track width
+    const trackWidth = trackS.offsetWidth - riyaS.offsetWidth - 8
+    const totalSteps = 80, startLeft=8
+    let step=0
+    const leftR_end = startLeft + trackWidth
+    const leftA_end = startLeft + trackWidth
+
+    // Animation based on relative speeds
+    const id = setInterval(()=>{
+      step++
+      const timeElapsed = step / totalSteps * Math.max(tR, tA)
+
+      // Calculate positions based on distance covered
+      const distR = Math.min(D, vR * timeElapsed)
+      const distA = Math.min(D, vA * timeElapsed)
+
+      const pctR = distR / D
+      const pctA = distA / D
+
+      riyaS.style.left = (startLeft + pctR * trackWidth) + 'px'
+      arjunS.style.left = (startLeft + pctA * trackWidth) + 'px'
+
+      if(step>=totalSteps) clearInterval(id)
+    }, 40)
+
+    // Chart: distance vs time
+    const labels=[]; const rDist=[]; const aDist=[]
+    const steps=50
+    const maxTime = Math.max(tR, tA)
+    for(let i=0;i<=steps;i++){
+      const tt = (i/steps) * maxTime
+      labels.push(toFixed(tt,1))
+      rDist.push(toFixed(Math.min(D, vR*tt),1))
+      aDist.push(toFixed(Math.min(D, vA*tt),1))
+    }
+    updateChartS(labels,rDist,aDist)
+
+    // result
+    let winner = (Math.abs(tR - tA) < 1e-6) ? 'Tie' : (tR < tA ? 'Riya' : 'Arjun')
+    let msg = `Race results: Riya ${toFixed(tR,2)}s, Arjun ${toFixed(tA,2)}s. `
+    if(winner === 'Tie') msg += 'It\'s a tie! 🤝'
+    else msg += `Winner: ${winner}! ${winner==='Riya'? '🔴' : '🔵'}`
+
+    const fb = document.getElementById('feedbackS')
+    fb.textContent = msg
+    fb.style.background = 'rgba(11,116,218,0.1)'
+    fb.style.color = 'var(--accent)'
+
+    updateProgress({mode:'speed',D,vR,vA,tR,tA,winner})
+  }
+
+  // prediction check: student predicts minimum speed Riya needs to beat Arjun
+  document.getElementById('checkPred_S').onclick = ()=>{
+    const D = parseFloat(raceDist_S_range.value), vA = parseFloat(spdA_S_range.value)
+    const student = parseFloat(document.getElementById('predictSpeed_S').value)
+    const fb = document.getElementById('feedbackS')
+
+    if(isNaN(student)){
+      fb.style.color='var(--muted)'; fb.style.background='rgba(0,0,0,0.05)'
+      fb.textContent = 'Please enter a number to check your prediction! 📝';
+      return;
+    }
+
+    if(student > vA){
+      fb.style.color='var(--good)'; fb.style.background='rgba(31,157,85,0.1)'
+      fb.textContent = `🎉 Correct! ${student} m/s > ${vA} m/s — Riya will win!`
+    } else if(Math.abs(student - vA) < 1e-6){
+      fb.style.color='var(--warn)'; fb.style.background='rgba(246,166,35,0.1)'
+      fb.textContent = `⚖️ At ${student} m/s = ${vA} m/s, it would be a tie!`
+    } else {
+      fb.style.color='var(--bad)'; fb.style.background='rgba(214,69,69,0.1)'
+      fb.textContent = `❌ ${student} m/s is not enough — Arjun at ${vA} m/s would be faster!`
+    }
+    updateProgress({mode:'speed_pred',student,requiredCompare: vA})
+  }
+
+  document.getElementById('resetS').onclick = ()=>{
+    riyaS.style.left='8px'; arjunS.style.left='8px'; setText('timeR_S','0'); setText('timeA_S','0');
+    const fb = document.getElementById('feedbackS')
+    fb.textContent=''; fb.style.background=''; fb.style.color=''
+    if(chartS) { chartS.data.labels=[]; chartS.data.datasets[0].data=[]; chartS.data.datasets[1].data=[]; chartS.update(); }
+  }
+
+  function initChartS(){
+    const ctx = document.getElementById('chartS').getContext('2d')
+    chartS = new Chart(ctx,{type:'line',data:{labels:[],datasets:[
+      {label:'Riya distance (m)',data:[],borderColor:'#ff7b7b',backgroundColor:'rgba(255,123,123,0.1)',fill:false,tension:0.1},
+      {label:'Arjun distance (m)',data:[],borderColor:'#4f8cff',backgroundColor:'rgba(79,140,255,0.1)',fill:false,tension:0.1}
+    ]}, options:{
+      responsive:true,
+      plugins:{legend:{position:'top',labels:{usePointStyle:true}}},
+      scales:{y:{beginAtZero:true,title:{display:true,text:'Distance (m)'}},x:{title:{display:true,text:'Time (s)'}}},
+      elements:{point:{radius:2}}
+    }})
+  }
+  function updateChartS(labels,dR,dA){ if(chartS){ chartS.data.labels = labels; chartS.data.datasets[0].data = dR; chartS.data.datasets[1].data = dA; chartS.update(); } }
+
+  /* ------------------------
+     Formula Puzzle Logic
+     ------------------------ */
+  const hideVarF = document.getElementById('hideVarF'), speedF = document.getElementById('speedF'), distanceF = document.getElementById('distanceF'), timeF = document.getElementById('timeF'), predictF = document.getElementById('predictF')
+
+  function adjustHiddenInputs(){
+    const hv = hideVarF.value
+    speedF.disabled = (hv==='speed'); distanceF.disabled = (hv==='distance'); timeF.disabled = (hv==='time')
+    speedF.style.opacity = speedF.disabled ? '0.5' : '1'
+    distanceF.style.opacity = distanceF.disabled ? '0.5' : '1'
+    timeF.style.opacity = timeF.disabled ? '0.5' : '1'
+
+    const fb = document.getElementById('feedbackF')
+    fb.textContent=''; fb.style.background=''; fb.style.color=''
+  }
+  hideVarF.onchange = adjustHiddenInputs
+  adjustHiddenInputs()
+
+  function computeHidden(){
+    const hv = hideVarF.value
+    const s = parseFloat(speedF.value), d = parseFloat(distanceF.value), t = parseFloat(timeF.value)
+    if(hv==='speed') return d / t
+    if(hv==='distance') return s * t
+    return d / s
+  }
+
+  document.getElementById('checkF').onclick = ()=>{
+    const actual = computeHidden()
+    const guess = parseFloat(predictF.value)
+    const fb = document.getElementById('feedbackF')
+
+    if(isNaN(guess)){
+      fb.style.color='var(--muted)'; fb.style.background='rgba(0,0,0,0.05)'
+      fb.textContent = 'Please enter your prediction! 📝';
+      return;
+    }
+
+    const diff = Math.abs(guess - actual)
+    const tolerance = Math.max(0.05, 0.05*Math.abs(actual))
+
+    if(diff <= tolerance){
+      fb.style.color='var(--good)'; fb.style.background='rgba(31,157,85,0.1)'
+      fb.textContent = `🎉 Excellent! Your guess ${guess} is very close to ${toFixed(actual,3)}!`
+    } else {
+      fb.style.color='var(--warn)'; fb.style.background='rgba(246,166,35,0.1)'
+      fb.textContent = `🤔 Not quite! Your guess: ${guess}, actual: ${toFixed(actual,3)}. ${explainHidden(hideVarF.value)}`
+    }
+    updateProgress({mode:'formula_pred',hidden:hideVarF.value,actual:toFixed(actual,3),guess})
+  }
+
+  document.getElementById('revealF').onclick = ()=>{
+    const actual = computeHidden()
+    const fb = document.getElementById('feedbackF')
+    fb.textContent = `💡 Answer: ${toFixed(actual,3)}. ${explainHidden(hideVarF.value)}`
+    fb.style.color = 'var(--accent)'
+    fb.style.background = 'rgba(11,116,218,0.1)'
+    updateProgress({mode:'formula_reveal',hidden:hideVarF.value,actual:toFixed(actual,3)})
+  }
+
+  function explainHidden(which){
+    if(which==='speed') return 'Speed = Distance ÷ Time. Higher speed covers same distance faster! 🏃‍♀️'
+    if(which==='distance') return 'Distance = Speed × Time. More speed or time = more distance! 📏'
+    return 'Time = Distance ÷ Speed. Higher speed means less time needed! ⏱️'
+  }
+
+  /* ------------------------
+     Progress logging (using variables instead of localStorage for WebView compatibility)
+     ------------------------ */
+  let progressHistory = []
+
+  function updateProgress(obj){
+    progressHistory.push({...obj, ts:new Date().toISOString()})
+    // Keep only last 20 entries
+    if(progressHistory.length > 20) {
+      progressHistory = progressHistory.slice(-20)
+    }
+    renderProgress()
+  }
+
+  function renderProgress(){
+    const box = document.getElementById('progressBox')
+    if(progressHistory.length===0){
+      box.innerHTML = '<div style="text-align:center;color:var(--muted);padding:20px;">🎯 No attempts yet.<br>Start making predictions!</div>'
+      return
+    }
+
+    const last = progressHistory.slice(-5).reverse()
+    box.innerHTML = last.map((it, index) => {
+      const time = it.ts.split('T')[1].split('.')[0].slice(0,5)
+      const mode = it.mode.replace('_', ' ')
+      return `<div class="progress-item">
+        <div style="font-weight:600;color:var(--accent);margin-bottom:2px;">${mode}</div>
+        <div style="font-size:11px;color:var(--muted);">${time} • ${getProgressSummary(it)}</div>
+      </div>`
+    }).join('')
+  }
+
+  function getProgressSummary(item) {
+    if(item.mode === 'distance_pred') return `Predicted: ${item.predict}, Actual: ${item.actual}`
+    if(item.mode === 'speed_pred') return `Guessed: ${item.student} m/s vs ${item.requiredCompare} m/s`
+    if(item.mode === 'formula_pred') return `${item.hidden}: guessed ${item.guess}, actual ${item.actual}`
+    if(item.mode === 'distance') return `Result: ${item.result} (${item.dR}m vs ${item.dA}m)`
+    if(item.mode === 'speed') return `Winner: ${item.winner} (${item.tR}s vs ${item.tA}s)`
+    return 'Completed'
+  }
+
+  /* ------------------------
+     Init everything
+     ------------------------ */
+  window.addEventListener('load', ()=>{
+    activateTab('Distance')
+    initChartD(); initChartS(); renderProgress()
+  })
+
+  // Better mobile UX: Enter key triggers check buttons
+  document.getElementById('predictSpeed_S').addEventListener('keydown', e=>{
+    if(e.key==='Enter') {
+      e.preventDefault()
+      document.getElementById('checkPred_S').click()
+    }
+  })
+
+  predictF.addEventListener('keydown', e=>{
+    if(e.key==='Enter') {
+      e.preventDefault()
+      document.getElementById('checkF').click()
+    }
+  })
+
+  // Prevent zoom on input focus (iOS Safari)
+  const inputs = document.querySelectorAll('input[type="number"]')
+  inputs.forEach(input => {
+    input.addEventListener('focus', () => {
+      input.style.fontSize = '16px'
+    })
+  })
+
+  // Add haptic feedback simulation for buttons (if running in app)
+  const buttons = document.querySelectorAll('.btn')
+  buttons.forEach(btn => {
+    btn.addEventListener('touchstart', () => {
+      if (window.navigator && window.navigator.vibrate) {
+        window.navigator.vibrate(10)
+      }
+    })
+  })
+
+</script>
+</body>
+</html>

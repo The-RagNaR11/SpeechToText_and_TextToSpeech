@@ -3,7 +3,7 @@ package com.ragnar.SpeechModel
 import android.os.Bundle
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
-import com.ragnar.SpeechModel.Simulations.RaceStorySimulationFragment
+import com.ragnar.SpeechModel.Simulations.LoadSimulationFragment
 import com.ragnar.SpeechModel.SpeechModels.SpeechToTextFragment
 import com.ragnar.SpeechModel.SpeechModels.TextToSpeechFragment
 
@@ -35,7 +35,7 @@ class MainActivity : AppCompatActivity() {
 
         simulationButton.setOnClickListener {
             supportFragmentManager.beginTransaction()
-                .replace(R.id.frameLayout, RaceStorySimulationFragment())
+                .replace(R.id.frameLayout, LoadSimulationFragment())
                 .commit()
         }
     }
