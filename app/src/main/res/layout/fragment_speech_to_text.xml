@@ -17,6 +17,16 @@
         android:layout_marginBottom="32dp"
         android:gravity="center" />
 
+    <Spinner
+        android:id="@+id/spinnerLanguage"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_marginBottom="24dp"
+        android:spinnerMode="dropdown"
+        android:padding="8dp"
+        android:background="@drawable/rounded_spinner"
+        android:dropDownWidth="250dp" />
+
     <TextView
         android:id="@+id/textViewStatus"
         android:layout_width="wrap_content"
@@ -64,7 +74,5 @@
             android:background="@drawable/rounded_textview"
             android:minHeight="100dp"
             android:gravity="top|start" />
-
     </ScrollView>
-
 </LinearLayout>

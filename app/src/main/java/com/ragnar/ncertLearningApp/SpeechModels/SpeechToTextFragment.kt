@@ -15,34 +15,45 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.ragnar.ncertLearningApp.R
-import java.util.Locale
 
+/**
+ * Fragment for converting speech to text with multiple language support.
+ * Allows users to pick a language from a dropdown (Spinner) and
+ * recognize speech in that language, displaying the result in the correct script.
+ */
 class SpeechToTextFragment : Fragment() {
 
     private lateinit var micButton: Button
     private lateinit var resultTextView: TextView
     private lateinit var statusTextView: TextView
+    private lateinit var languageSpinner: Spinner
     private lateinit var speechRecognizer: SpeechRecognizer
 
-    // Add a handler for the cooldown
     private val handler = Handler(Looper.getMainLooper())
-
     private var isListening = false
     private val RECORD_AUDIO_PERMISSION_REQUEST = 101
     private val TAG = "SpeechToTextFragment"
 
+    // Default language is English
+    private var selectedLanguageCode = "en-IN"
+
+    // Supported languages (display name → code)
+    private val languages = mapOf(
+        "English" to "en-IN",
+        "हिंदी (Hindi)" to "hi-IN",
+        "ಕನ್ನಡ (Kannada)" to "kn-IN",
+        "தமிழ் (Tamil)" to "ta-IN",
+        "తెలుగు (Telugu)" to "te-IN"
+    )
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_speech_to_text, container, false)
     }
 
@@ -52,11 +63,29 @@ class SpeechToTextFragment : Fragment() {
         micButton = view.findViewById(R.id.btnMicrophone)
         resultTextView = view.findViewById(R.id.textViewResult)
         statusTextView = view.findViewById(R.id.textViewStatus)
+        languageSpinner = view.findViewById(R.id.spinnerLanguage)
+
+        // Setup Spinner adapter
+        val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, languages.keys.toList())
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        languageSpinner.adapter = adapter
+
+        // Default selection: English
+        val defaultIndex = languages.keys.toList().indexOf("English")
+        languageSpinner.setSelection(defaultIndex)
+
+        languageSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>, v: View?, position: Int, id: Long) {
+                val selectedLang = parent.getItemAtPosition(position).toString()
+                selectedLanguageCode = languages[selectedLang] ?: "en-IN"
+                statusTextView.text = "Selected: $selectedLang"
+            }
+            override fun onNothingSelected(parent: AdapterView<*>) {}
+        }
 
         if (!SpeechRecognizer.isRecognitionAvailable(requireContext())) {
             Toast.makeText(requireContext(), "Speech recognition not available", Toast.LENGTH_SHORT).show()
-            Log.e(TAG, "Speech recognition not available on this device.")
-            micButton.isEnabled = false // MODIFIED: Disable button if not available
+            micButton.isEnabled = false
             return
         }
 
@@ -88,78 +117,63 @@ class SpeechToTextFragment : Fragment() {
     }
 
     private fun toggleSpeechRecognition() {
-        if (isListening) {
-            stopListening()
-        } else {
-            startListening()
-        }
+        if (isListening) stopListening() else startListening()
     }
 
     private fun startListening() {
         resultTextView.text = ""
         val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
             putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
-            putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault())
+            putExtra(RecognizerIntent.EXTRA_LANGUAGE, selectedLanguageCode)
             putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, true)
             putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 3)
         }
 
         speechRecognizer.startListening(intent)
         isListening = true
-        micButton.isEnabled = true // Ensure button is enabled
         micButton.text = "⏹"
         micButton.backgroundTintList =
             ColorStateList.valueOf(ContextCompat.getColor(requireContext(), android.R.color.holo_red_dark))
         statusTextView.text = "Listening... Speak now"
-        Log.e(TAG, "Speech recognition started.")
     }
 
     private fun stopListening() {
         speechRecognizer.stopListening()
     }
 
-    private fun resetUiAfterRecognition(isError: Boolean) {
-        if (isListening) { // Prevent this from being called multiple times
+    private fun resetUiAfterRecognition() {
+        if (isListening) {
             isListening = false
-            micButton.isEnabled = false // Disable button during cooldown
-            handler.postDelayed({
-                micButton.isEnabled = true // Re-enable after 1 second
-            }, 1000)
+            micButton.isEnabled = false
+            handler.postDelayed({ micButton.isEnabled = true }, 1000)
         }
         micButton.text = "🎤"
         micButton.backgroundTintList =
             ColorStateList.valueOf(ContextCompat.getColor(requireContext(), com.google.android.material.R.color.design_default_color_primary))
-        if (!isError) {
-            statusTextView.text = "Tap microphone to start"
-        }
+        statusTextView.text = "Tap microphone to start"
     }
+
     private val speechRecognitionListener = object : RecognitionListener {
         override fun onReadyForSpeech(params: Bundle?) {
             statusTextView.text = "Ready for speech..."
-            Log.e(TAG, "onReadyForSpeech: Ready")
         }
 
         override fun onBeginningOfSpeech() {
             statusTextView.text = "Speech detected..."
-            Log.e(TAG, "onBeginningOfSpeech: Speech started")
         }
 
         override fun onRmsChanged(rmsdB: Float) {}
 
-        override fun onBufferReceived(buffer: ByteArray?) {
-            Log.e(TAG, "onBufferReceived: Audio buffer received")
-        }
+        override fun onBufferReceived(buffer: ByteArray?) {}
 
         override fun onEndOfSpeech() {
             statusTextView.text = "Processing speech..."
-            Log.e(TAG, "onEndOfSpeech: Speech ended")
-            resetUiAfterRecognition(isError = false)
         }
 
         override fun onError(error: Int) {
             val errorMessage = when (error) {
                 SpeechRecognizer.ERROR_AUDIO -> "Audio recording error"
-                SpeechRecognizer.ERROR_CLIENT -> "Client side error (Check Google App)"
+                SpeechRecognizer.ERROR_CLIENT -> "Client error"
                 SpeechRecognizer.ERROR_INSUFFICIENT_PERMISSIONS -> "Insufficient permissions"
                 SpeechRecognizer.ERROR_NETWORK -> "Network error"
                 SpeechRecognizer.ERROR_NETWORK_TIMEOUT -> "Network timeout"
@@ -170,34 +184,26 @@ class SpeechToTextFragment : Fragment() {
                 else -> "Unknown error"
             }
             statusTextView.text = "Error: $errorMessage"
-            Log.e(TAG, "onError: ($error) $errorMessage")
-            resetUiAfterRecognition(isError = true)
+            resetUiAfterRecognition()
         }
 
         override fun onResults(results: Bundle?) {
             val matches = results?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)
             if (!matches.isNullOrEmpty()) {
-                val recognizedText = matches[0]
-                resultTextView.text = recognizedText
+                resultTextView.text = matches[0]
                 statusTextView.text = "Speech recognized successfully!"
-                Log.e(TAG, "onResults: Final result - '$recognizedText'")
-            } else {
-                Log.e(TAG, "onResults: No results found.")
             }
+            resetUiAfterRecognition()
         }
 
         override fun onPartialResults(partialResults: Bundle?) {
             val matches = partialResults?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)
             if (!matches.isNullOrEmpty()) {
-                val partialText = matches[0]
-                resultTextView.text = partialText
-                Log.e(TAG, "onPartialResults: Partial result - '$partialText'")
+                resultTextView.text = matches[0]
             }
         }
 
-        override fun onEvent(eventType: Int, params: Bundle?) {
-            Log.e(TAG, "onEvent: Event type - $eventType")
-        }
+        override fun onEvent(eventType: Int, params: Bundle?) {}
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
@@ -206,19 +212,16 @@ class SpeechToTextFragment : Fragment() {
             if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 toggleSpeechRecognition()
             } else {
-                Toast.makeText(requireContext(), "Audio permission is required for speech recognition", Toast.LENGTH_LONG).show()
-                Log.e(TAG, "Audio permission denied by user.")
+                Toast.makeText(requireContext(), "Audio permission required", Toast.LENGTH_LONG).show()
             }
         }
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
-        // Remove pending callbacks to prevent memory leaks
         handler.removeCallbacksAndMessages(null)
         if (::speechRecognizer.isInitialized) {
             speechRecognizer.destroy()
-            Log.e(TAG, "Speech recognizer destroyed.")
         }
     }
 }
